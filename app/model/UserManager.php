@@ -43,6 +43,8 @@ class UserManager extends DatabaseManager
 
     public function getUser($url)
     {
-        return $this->database->table(self::TABLE_NAME)->where(self::COL_ID, 31)->fetch();
+
+        return $this->database->table(self::TABLE_NAME)->where(self::COL_ID, 24)->fetch();
+
     }
 }

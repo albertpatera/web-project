@@ -3,6 +3,7 @@
 namespace App\Presenters;
 
 use App\Model\UserManager;
+use mysql_xdevapi\Exception;
 use Nette;
 use Nette\Application\UI\Presenter;
 
@@ -30,14 +31,18 @@ final class UserPresenter extends Presenter
 
     public function renderEdit($url = null)
     {
-        $user = $this->userManager->getUser($url);
+        //$user = $this->userManager->getUser($url);
         /*if (!($user = $this->userManager->get($url)))
             $this->error(); // Vyhazuje výjimku BadRequestException.*/
+
+        //$user = $this->userManager->getUser("eeee");
         try {
+
             $user = $this->userManager->getUser($url);
         } catch (\Exception $e) {
-            throw new \Exception($e->getMessage());
+            throw new \Exception("invalid url, please contact administrator");
         }
+
         $this->getTemplate()->userValue = $user;
         //dumpe($url);
     }

@@ -7,7 +7,7 @@
     {/block}
     <h1 n:block="title" class="test-center alert alert-success">Adding articles</h1>
     {*dodelat dyn. menu, ktere se bude nacitat z databaze*}
-    <h2><a n:href="Article:default">Article Manager</a></h2>
+    <h2><a n:href="Admin:Article:default">Article Manager</a></h2>
     {control addUser}
     <table class="table">
 
@@ -21,7 +21,7 @@
 
             <tr n:if="$article">
                 <td>{$article->id}</td>
-                <td>{$article->username}</td>
+                <td>{$article->title}</td>
                 <td>{$article->role}</td>
 
                 <td>

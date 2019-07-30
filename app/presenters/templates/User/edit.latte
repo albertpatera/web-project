@@ -11,9 +11,14 @@
     {control addUser}
     <table class="table">
 
-        {foreach $userValue as $article}
-            {$article}
-            <a n:href="User:edit $article">eeee</a>
+        <tr>
+            <th>#</th>
+            <th>username</th>
+            <th>role</th>
+            <th>action</th>
+        </tr>
+        {foreach $userValue as $userPrint}
+            {$userPrint}
         {/foreach}
     </table>
 {/block}

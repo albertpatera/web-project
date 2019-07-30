@@ -46,7 +46,9 @@ final class ArticlePresenter extends Presenter
     protected function createComponentPostForm()
     {
         $form = new Nette\Application\UI\Form();
-        $form->addText('username', 'Titulek:')
+        $form->addText('title', 'Titulek:')
+            ->setRequired();
+        $form->addText('perex', 'perex:')
             ->setRequired();
         $form->addTextArea('description', 'description')
            ->setRequired();
