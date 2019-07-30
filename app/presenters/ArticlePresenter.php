@@ -35,7 +35,8 @@ final class ArticlePresenter extends Presenter
     protected function createComponentAddArticle()
     {
        $form = new Nette\Application\UI\Form();
-       $form->addText('perex', 'Perex:')->setDefaultValue("ff");
+       $form->addText('perex', 'Perex:')->setRequired();
+       $form->addText('description', 'description:')->setRequired();
        $form->addSubmit('sbmt', 'Odeslat');
         $form->onSuccess[] = [$this, 'addingArticleSuccessed'];
 
@@ -47,8 +48,8 @@ final class ArticlePresenter extends Presenter
         $form = new Nette\Application\UI\Form();
         $form->addText('username', 'Titulek:')
             ->setRequired();
-       // $form->addTextArea('content', 'Obsah:')
-         //   ->setRequired();
+        $form->addTextArea('description', 'description')
+           ->setRequired();
 
         $form->addSubmit('send', 'Uložit a publikovat');
         $form->onSuccess[] = [$this, 'postFormSucceeded'];

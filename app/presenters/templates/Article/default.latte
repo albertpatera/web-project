@@ -1,8 +1,25 @@
 {control addArticle}
 
 
-{foreach $articleValue as $article}
-   {$article->description}
-{/foreach}
+   <h1 n:block="title">Adding articles</h1>
 
-{control postForm}
+{block content}
+
+   {control postForm}
+   <table border="1">
+   {foreach $articleValue as $article}
+
+      <tr>
+         <td>{$article->id}</td>
+         <td>{$article->username}</td>
+         <td>{$article->description}</td>
+         <td>
+            <a n:href="Article:default">{$article->username}</a>
+         </td>
+      </tr>
+
+
+{/foreach}
+   </table>
+{/block}
+
