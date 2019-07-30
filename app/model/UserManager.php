@@ -4,6 +4,7 @@ use App\Model\DatabaseManager;
 use Nette\Database\Table;
 use Nette\Database\Table\Selection;
 use Nette\Utils\ArrayHash;
+use Tracy\Debugger;
 
 class UserManager extends DatabaseManager
 {
@@ -15,7 +16,14 @@ class UserManager extends DatabaseManager
     public function insertUser(array $username)
     {
         try {
-            $this->database->table(self::TABLE_NAME)->insert([$username]);
+            if(empty($username[self::COL_ID])) {
+                $this->database->table(self::TABLE_NAME)->insert([$username]);
+                Debugger::barDump('inserting..');
+            } else {
+                $this->database->table(self::TABLE_NAME)->where(self::COL_ID, $username[self::COL_ID])->update([$username]);
+                Debugger::barDump("updating");
+
+            }
             echo "insertiíng ok";
         } catch (\Exception $e) {
             echo "<h3 class='text-danger'>Error while inserting user</h3>";

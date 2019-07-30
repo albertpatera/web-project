@@ -28,6 +28,13 @@ final class UserPresenter extends Presenter
         $this->getTemplate()->userValue = $user;
     }
 
+    public function renderEdit()
+    {
+        $user = $this->userManager->getUsers();
+
+        $this->getTemplate()->userValue = $user;
+    }
+
     public function renderRemove($user = null)
     {
         try {
@@ -52,6 +59,24 @@ final class UserPresenter extends Presenter
         $formAddUser->onSuccess[] = [$this, 'addingUserSuccessed'];
 
         return $formAddUser;
+    }
+
+    protected function createComponentEditForm()
+    {
+        $formEditUser = new Nette\Application\UI\Form();
+        $formEditUser->addText('username', 'Username')->setRequired()->setDefaultValue("eee");
+
+        $formEditUser->addText('role', 'role:')->setRequired();
+        $formEditUser->addSubmit('submitAddU', 'Privat uzivatele');
+        $formEditUser->onSuccess[] = [$this, 'editUserSuccessed'];
+
+
+        return $formEditUser;
+    }
+
+    public function editUserSuccessed(Nette\Application\UI\Form $formEditUser, Nette\Utils\ArrayHash $values)
+    {
+        echo "eeeewewqrq";
     }
 
     public function addingUserSuccessed(Nette\Application\UI\Form  $formAddUser, array $values)

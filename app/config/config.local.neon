@@ -1,0 +1,22 @@
+parameters:
+    database:
+        driver: mysql
+        host: localhost
+        port: 3306
+        dbname: test
+        user: newuser
+        password: password
+        #dbname: articles
+
+#database:
+ #       dsn: '%database.driver%:host=%database.host%;port:%database.port%;dbname=articles'
+  #      user: %database.user%
+   #     password: %database.password%
+
+# Konfigurace databázového připojení v rámci celé aplikace.
+database:
+    dsn: 'mysql:host=127.0.0.1;dbname=web' # Typ, adresa a název databáze
+    user: newuser     # Uživatelské jméno
+    password: password # Heslo
+    options:
+       lazy: yes

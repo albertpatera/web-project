@@ -1,0 +1,21 @@
+
+{block content}
+    {block head}
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {/block}
+    <h1 n:block="title" class="test-center alert alert-success">Adding articles</h1>
+    {*dodelat dyn. menu, ktere se bude nacitat z databaze*}
+    <h2><a n:href="Article:default">Article Manager</a></h2>
+    {control addUser}
+    <table class="table">
+
+        {foreach $userValue as $article}
+
+            {control editForm}
+
+
+        {/foreach}
+    </table>
+{/block}
