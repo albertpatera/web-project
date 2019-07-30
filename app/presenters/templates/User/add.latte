@@ -1,0 +1,37 @@
+
+{block content}
+    {block head}
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {/block}
+    <h1 n:block="title" class="test-center alert alert-success">Adding articles</h1>
+    {*dodelat dyn. menu, ktere se bude nacitat z databaze*}
+    <h2><a n:href="Article:default">Article Manager</a></h2>
+    {control addUser}
+    <table class="table">
+
+        <tr>
+            <th>#</th>
+            <th>username</th>
+            <th>role</th>
+            <th>action</th>
+        </tr>
+        {foreach $userValue as $article}
+
+            <tr n:if="$article">
+                <td>{$article->id}</td>
+                <td>{$article->username}</td>
+                <td>{$article->role}</td>
+
+                <td>
+                    | <a n:href="User:edit">Edit</a>
+                    | <a n:href="User:remove">X</a>
+                    | <a n:href="User:visible">visible</a> |
+                </td>
+            </tr>
+
+
+        {/foreach}
+    </table>
+{/block}

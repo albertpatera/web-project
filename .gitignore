@@ -1,2 +1,7 @@
 app/config/config.local.neon
 vendor
+
+idea/php.xml
+.idea/web-project.iml
+.idea/workspace.xml
+

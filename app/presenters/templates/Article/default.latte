@@ -1,20 +1,34 @@
-{control addArticle}
-
-
-   <h1 n:block="title">Adding articles</h1>
 
 {block content}
-
+   {block head}
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+   {/block}
+   <h1 n:block="title" class="test-center alert alert-success">Adding articles</h1>
+   <h2><a n:href="User:add">User manager</a></h2>
    {control postForm}
-   <table border="1">
-   {foreach $articleValue as $article}
+   <table class="table">
+      <tr>
+         <th>#</th>
+         <th>username</th>
+         <th>description</th>
+         <th>profile</th>
+         <th>action</th>
+      </tr>
+      {foreach $articleValue as $article}
 
       <tr>
          <td>{$article->id}</td>
          <td>{$article->username}</td>
          <td>{$article->description}</td>
          <td>
-            <a n:href="Article:default">{$article->username}</a>
+            <a n:href="Article:default">link</a>
+         </td>
+         <td>
+           | <a n:href="Article:edit">Edit</a>
+           | <a n:href="Article:remove">X</a>
+           | <a n:href="Article:visible">visible</a> |
          </td>
       </tr>
 
