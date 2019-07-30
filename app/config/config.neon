@@ -6,10 +6,14 @@ application:
 	mapping:
 		*: App\*Module\Presenters\*Presenter
 
+# Konfigurace databázového připojení v rámci celé aplikace.
 database:
-    dsn: 'mysql:host=37.205.10.181;dbname=articles'
-    user: phpmyadmin
-    password:
+    dsn: 'mysql:host=localhost;dbname=articles' # Typ, adresa a název databáze
+    user:  root
+    password: some_pass
+    options:
+        lazy: yes
+
 session:
 	expiration: 14 days
 
