@@ -28,11 +28,18 @@ final class UserPresenter extends Presenter
         $this->getTemplate()->userValue = $user;
     }
 
-    public function renderEdit()
+    public function renderEdit($url = null)
     {
-        $user = $this->userManager->getUsers();
-
+        $user = $this->userManager->getUser($url);
+        /*if (!($user = $this->userManager->get($url)))
+            $this->error(); // Vyhazuje výjimku BadRequestException.*/
+        try {
+            $user = $this->userManager->getUser($url);
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
         $this->getTemplate()->userValue = $user;
+        //dumpe($url);
     }
 
     public function renderRemove($user = null)

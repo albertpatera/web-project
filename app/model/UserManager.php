@@ -40,4 +40,9 @@ class UserManager extends DatabaseManager
     {
         return $this->database->table(self::TABLE_NAME)->where(self::COL_ID, 15)->delete();
     }
+
+    public function getUser($url)
+    {
+        return $this->database->table(self::TABLE_NAME)->where(self::COL_ID, 31)->fetch();
+    }
 }

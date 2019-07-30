@@ -18,7 +18,7 @@ final class RouterFactory
 	{
 		$router = new RouteList;
 		$router[] = new Route('<presenter>/<action>[/<id>]', 'Article:default');
-		$router[] = new Route('<url>', 'User:add');
+		$router[] = new Route('[<url>]', 'User:add');
 		$router[] = new Route('<presenter>/<action>[/<id>]', 'User:add');
 		//$router[] = new Route('<url>', 'Article:add');
 		return $router;

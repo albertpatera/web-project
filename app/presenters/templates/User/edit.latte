@@ -12,10 +12,8 @@
     <table class="table">
 
         {foreach $userValue as $article}
-
-            {control editForm}
-
-
+            {$article}
+            <a n:href="User:edit $article">eeee</a>
         {/foreach}
     </table>
 {/block}
