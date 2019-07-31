@@ -16,6 +16,8 @@
             <th>username</th>
             <th>role</th>
             <th>url</th>
+            <th>profile image</th>
+            <th>profile image</th>
             <th>action</th>
         </tr>
         {foreach $userValue as $article}
@@ -25,6 +27,7 @@
                 <td>{$article->username}</td>
                 <td>{$article->role}</td>
                 <td>{$article->url}</td>
+                <td>{$article->prof_image}</td>
                 <td>
                     <a n:href="User:edit $article->url">{$article->url}</a>
                 </td>

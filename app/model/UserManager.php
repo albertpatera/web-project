@@ -32,9 +32,15 @@ class UserManager extends DatabaseManager
         }
     }
 
+
+    public function updateUser($user)
+    {
+        return $this->database->table(self::TABLE_NAME)->update($user);
+    }
+
     public function getUsers()
     {
-        return $this->database->table(self::TABLE_NAME)->order(self::COL_ORDER . " DESC");
+        return $this->database->table(self::TABLE_NAME)->order(self::COL_URL . " DESC");
     }
 
     public function deleteUser($user)
