@@ -12,7 +12,8 @@ class UserManager extends DatabaseManager
         TABLE_NAME = 'user',
         COL_USERNAME = 'username',
         COL_ORDER = 'id',
-        COL_ID = 'id';
+        COL_ID = 'id',
+        COL_URL = 'url';
     public function insertUser(array $username)
     {
         try {
@@ -41,8 +42,15 @@ class UserManager extends DatabaseManager
         return $this->database->table(self::TABLE_NAME)->where(self::COL_ID, 15)->delete();
     }
 
-    public function getUser($url)
+    public function getArticle($url = null)
     {
-        return $this->database->table(self::TABLE_NAME)->where(self::COL_ID, 31)->fetch();
+       try {
+           echo "url address is not defined";
+           return $this->database->table(self::TABLE_NAME)->where(self::COL_URL, $url)->fetchAll();
+
+       } catch (\Exception $e) {
+           throw new \Exception('url does not exists');
+       }
+       // return $this->database->table(self::TABLE_NAME)->where(self::COL_URL, $url)->fetch();
     }
 }

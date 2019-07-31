@@ -51,6 +51,7 @@ final class ArticlePresenter extends Presenter
         $form->addTextArea('description', 'description')
            ->setRequired();
 
+
         $form->addSubmit('send', 'Uložit a publikovat');
         $form->onSuccess[] = [$this, 'postFormSucceeded'];
 

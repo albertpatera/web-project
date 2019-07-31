@@ -15,6 +15,7 @@
             <th>#</th>
             <th>username</th>
             <th>role</th>
+            <th>url</th>
             <th>action</th>
         </tr>
         {foreach $userValue as $article}
@@ -23,6 +24,10 @@
                 <td>{$article->id}</td>
                 <td>{$article->username}</td>
                 <td>{$article->role}</td>
+                <td>{$article->url}</td>
+                <td>
+                    <a n:href="User:edit $article->url">{$article->url}</a>
+                </td>
 
                 <td>
                     | <a n:href="User:edit">Edit</a>
