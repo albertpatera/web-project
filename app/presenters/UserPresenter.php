@@ -28,18 +28,16 @@ final class UserPresenter extends Presenter
         $this->getTemplate()->userValue = $user;
     }
 
-    public function renderEdit($url = null)
+    public function renderEdit($user = null)
     {
-        $user = $this->userManager->getUser($url);
-        /*if (!($user = $this->userManager->get($url)))
-            $this->error(); // Vyhazuje výjimku BadRequestException.*/
         try {
-            $user = $this->userManager->getUser($url);
+            $user = $this->userManager->getArticle($user);
         } catch (\Exception $e) {
-            throw new \Exception($e->getMessage());
+            throw new \Exception('ERROR:' . $e->getMessage());
         }
+
         $this->getTemplate()->userValue = $user;
-        //dumpe($url);
+
     }
 
     public function renderRemove($user = null)
@@ -58,10 +56,14 @@ final class UserPresenter extends Presenter
     {
         /**
          * @TODO pak dodelat admin. role v db do selectu
+         * tady to funguje
          */
         $formAddUser = new Nette\Application\UI\Form();
         $formAddUser->addText('username', 'Username')->setRequired();
         $formAddUser->addText('role', 'role:')->setRequired();
+        $formAddUser->addText('url', 'url:')->setRequired();
+        $formAddUser->addTextArea('sign', 'About author ')
+            ->setRequired();
         $formAddUser->addSubmit('submitAddU', 'Privat uzivatele');
         $formAddUser->onSuccess[] = [$this, 'addingUserSuccessed'];
 
@@ -74,6 +76,9 @@ final class UserPresenter extends Presenter
         $formEditUser->addText('username', 'Username')->setRequired()->setDefaultValue("eee");
 
         $formEditUser->addText('role', 'role:')->setRequired();
+        $formEditUser->addText('url', 'url:')->setRequired();
+        $formEditUser->addTextArea('sign', 'About author:')
+            ->setRequired();
         $formEditUser->addSubmit('submitAddU', 'Privat uzivatele');
         $formEditUser->onSuccess[] = [$this, 'editUserSuccessed'];
 
