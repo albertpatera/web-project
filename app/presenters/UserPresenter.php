@@ -5,6 +5,7 @@ namespace App\Presenters;
 use App\Model\UserManager;
 use Nette;
 use Nette\Application\UI\Presenter;
+use Tracy\Debugger;
 
 
 final class UserPresenter extends Presenter
@@ -29,7 +30,22 @@ final class UserPresenter extends Presenter
     private $model;
 
 
+    //session workflow
+    /**
+     * @var Nette\Http\Session
+     */
+    private $session;
+    /**
+     * @var Nette\Http\Session;
+     */
+    private $sessionSection;
+    public function __construct(Nette\Http\Session $session)
+    {
+        $this->sessionSection = 'albert';
 
+    }
+
+//save relation
     public function renderAdd()
     {
         $user = $this->userManager->getUsers();
@@ -114,6 +130,8 @@ final class UserPresenter extends Presenter
     {
         try {
             $user = $this->userManager->insertUser($values);
+            $this->sessionSection = $values["username"];
+
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }

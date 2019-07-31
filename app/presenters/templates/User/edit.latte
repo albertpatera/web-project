@@ -11,19 +11,23 @@
     <title>Hello, world!</title>
 </head>
 <body>
+<div class="container-fluid">
 {foreach $userValue as $userOutput}
 
-    <div class="card" style="width:20rem;margin:20px 0 24px 0">
+    <div class="card d-inline-block" style="width:20rem;margin:20px 0 24px 0">
         <img class="card-img-top" src="{$userOutput->prof_image}">
         <div class="card-body">
-            <label class="badge badge-secondary">{$userOutput->role}</label>
+
             <h4 class="card-title">{$userOutput->username|upper}</h4>
-            <p class="card-text">{$userOutput->url}</p>
+            <label class="badge badge-secondary">{$userOutput->role}</label>
+            <p class="card-text"><a href="#">{$userOutput->url}</a></p>
             <p class="card-text text-justify text-muted"><i>{$userOutput->sign}</i></p>
             <a href="javascript:void(0)" class="btn btn-primary">See Profile</a>
+
         </div>
     </div>>
 {/foreach}
+</div>
 
 <!-- Optional JavaScript -->
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->
