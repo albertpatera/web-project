@@ -9,13 +9,15 @@
    <h2><a n:href="User:add">User manager</a></h2>
    {control postForm}
    <table class="table">
-      <tr>
+      {foreach $articleValue as $articleHeader}
+      <tr n:if="$articleHeader">
          <th>#</th>
-         <th>username</th>
+         <th>Main Title</th>
          <th>description</th>
          <th>profile</th>
          <th>action</th>
       </tr>
+      {/foreach}
       {foreach $articleValue as $article}
 
       <tr>

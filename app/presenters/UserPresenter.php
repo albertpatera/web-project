@@ -5,6 +5,7 @@ namespace App\Presenters;
 use App\Model\UserManager;
 use Nette;
 use Nette\Application\UI\Presenter;
+use Tracy\Debugger;
 
 
 final class UserPresenter extends Presenter
@@ -18,9 +19,33 @@ final class UserPresenter extends Presenter
      * @var UserManager @inject
      */
     public $userValue;
+    /**
+     * @var UserManager @inject
+     */
+    //public $records;
+
+    /**
+     * @var UserManager @inject
+     */
+    private $model;
 
 
+    //session workflow
+    /**
+     * @var Nette\Http\Session
+     */
+    private $session;
+    /**
+     * @var Nette\Http\Session;
+     */
+    private $sessionSection;
+    public function __construct(Nette\Http\Session $session)
+    {
+        $this->sessionSection = 'albert';
 
+    }
+
+//save relation
     public function renderAdd()
     {
         $user = $this->userManager->getUsers();
@@ -28,8 +53,10 @@ final class UserPresenter extends Presenter
         $this->getTemplate()->userValue = $user;
     }
 
+
     public function renderEdit($user = null)
     {
+
         try {
             $user = $this->userManager->getArticle($user);
         } catch (\Exception $e) {
@@ -62,9 +89,10 @@ final class UserPresenter extends Presenter
         $formAddUser->addText('username', 'Username')->setRequired();
         $formAddUser->addText('role', 'role:')->setRequired();
         $formAddUser->addText('url', 'url:')->setRequired();
-        $formAddUser->addTextArea('sign', 'About author ')
+        $formAddUser->addTextArea('sign', 'About author ')->setRequired();
+        $formAddUser->addText('prof_image', 'Profil image: ')
             ->setRequired();
-        $formAddUser->addSubmit('submitAddU', 'Privat uzivatele');
+        $formAddUser->addSubmit('submitAddU', 'add user');
         $formAddUser->onSuccess[] = [$this, 'addingUserSuccessed'];
 
         return $formAddUser;
@@ -86,6 +114,13 @@ final class UserPresenter extends Presenter
         return $formEditUser;
     }
 
+    public function actiionEdit()
+    {
+        $postId = $this->getParameter('user');
+    }
+
+
+
     public function editUserSuccessed(Nette\Application\UI\Form $formEditUser, Nette\Utils\ArrayHash $values)
     {
         echo "eeeewewqrq";
@@ -95,6 +130,8 @@ final class UserPresenter extends Presenter
     {
         try {
             $user = $this->userManager->insertUser($values);
+            $this->sessionSection = $values["username"];
+
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }
