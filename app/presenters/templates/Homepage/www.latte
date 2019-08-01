@@ -1,0 +1,26 @@
+
+{block content}
+    {block head}
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {/block}
+
+    {block body}
+        <div class="bg-light">
+            {foreach $articleValue as $item}
+                    <div class="row pl-5">
+                        <div class="col-lg-8 float-md-right">
+                            <div class="alert bg-white">
+                                <h2 class="title display-4">{$item->username}</h2>
+                                <article class="article-wrapper">{$item->description}</article>
+                                <hr>
+                                <h6 class="date display-6">Vytvořeno dne: </h6>
+                                <label class="badge badge-primary ">{$item->date_created}</label>
+                            </div>
+                        </div>
+                    </div>
+            {/foreach}
+        </div>
+    {/block}
+{/block}
