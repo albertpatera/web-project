@@ -24,3 +24,5 @@ services:
 	- App\Model\ArticleManager
 	- App\Presenters\UserPresenter
 	- App\Model\UserManager
+	- App\Presenters\HomepagePresenter
+	- App\Model\HomepageManager
