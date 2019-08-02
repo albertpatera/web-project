@@ -7,6 +7,7 @@
     {/block}
 
     {block body}
+
         <div class="bg-light">
             {foreach $articleValue as $item}
                     <div class="row pl-5">
@@ -19,6 +20,22 @@
                                 <h6 class="date display-6">Vytvořeno dne: </h6>
                                 <label class="badge badge-primary ">{$item->date_created|date:'d. m. Y'}</label>
                             </div>
+                        </div>
+                        <div class="col-md-4">
+                            {foreach $userValue as $userOutput}
+                                <div class="card d-inline-block" style="width:20rem;margin:20px 0 24px 0">
+                                    <img class="card-img-top" src="{$userOutput->prof_image}">
+                                    <div class="card-body">
+
+                                        <h4 class="card-title">{$userOutput->username|upper}</h4>
+                                        <label class="badge badge-secondary">{$userOutput->role}</label>
+                                        <p class="card-text"><a href="#">{$userOutput->url}</a></p>
+                                        <p class="card-text text-justify text-muted"><i>{$userOutput->sign}</i></p>
+                                        <a href="javascript:void(0)" class="btn btn-primary">See Profile</a>
+
+                                    </div>
+                                </div>
+                            {/foreach}
                         </div>
                     </div>
             {/foreach}

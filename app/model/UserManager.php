@@ -13,7 +13,8 @@ class UserManager extends DatabaseManager
         COL_USERNAME = 'username',
         COL_ORDER = 'id',
         COL_ID = 'id',
-        COL_URL = 'url';
+        COL_URL = 'url',
+        COL_HP = 'hp';
     public function insertUser(array $username)
     {
         try {
@@ -58,5 +59,19 @@ class UserManager extends DatabaseManager
            throw new \Exception('url does not exists');
        }
        // return $this->database->table(self::TABLE_NAME)->where(self::COL_URL, $url)->fetch();
+    }
+
+    public function getUserToHp()
+    {
+       try {
+            $this->database->table(self::TABLE_NAME)->order(self::COL_URL . " DESC");
+
+       } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+
+       }
+
+        return $this->database->table(self::TABLE_NAME)->where(self::COL_HP, 1)->order(self::COL_URL . " DESC");
+
     }
 }

@@ -4,14 +4,17 @@ namespace App\Presenters;
 
 use App\Model\ArticleManager;
 use App\Model\HomepageManager;
+use App\Model\UserManager;
 use Nette;
 
 
 final class HomepagePresenter extends Nette\Application\UI\Presenter
 {
+
     /**
-     * @var HomepageManager @inject;
+     * @var UserManager @inject
      */
+    public $userValue;
     /**
      * @var ArticleManager @inject
      */
@@ -20,15 +23,35 @@ final class HomepagePresenter extends Nette\Application\UI\Presenter
     {
         $article = $this->articleValue->getArticles();
         $this->getTemplate()->articleValue = $article;
-        if (!($article = $this->articleValue->getArticles())) {
-            $this->error(); // Vyhazuje výjimku BadRequestException.
-
-        }
-
         try {
-            $article = $this->articleValue->getArticles();
+            $userValue = $this->userValue->getUserToHp();
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }
+        $this->getTemplate()->userValue = $userValue;
+
+        if (!($article = $this->articleValue->getArticles())) {
+            $this->error("here is noot working :("); // Vyhazuje výjimku BadRequestException.
+        }
+        try {
+            $userValue = $this->userValue->getUserToHp();
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
+
+
+        try {
+            $article = $this->articleValue->getArticles();
+            if (!($userValue = $this->userValue->getUserToHp())) {
+                $this->error("Here is not working :( !"); // Vyhazuje výjimku BadRequestException.
+            }
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
+
+
+
+
+
     }
 }
