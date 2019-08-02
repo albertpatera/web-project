@@ -53,6 +53,8 @@ final class ArticlePresenter extends Presenter
 
         $form->addText('date_created', 'date_created')->setType('date')
            ->setRequired();
+        $form->addText('title_image', 'main section image:')
+            ->setRequired();
 
 
         $form->addSubmit('send', 'Uložit a publikovat');
