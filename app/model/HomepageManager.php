@@ -23,6 +23,6 @@ class HomepageManager extends DatabaseManager
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }
-        return $this->database->table(UserManager::TABLE_NAME)->where(UserManager::COL_HP, 1)->order(UserManager::COL_ORDER)->fetchAll();
+        return $this->database->table(UserManager::TABLE_NAME)->where(UserManager::COL_HP, 1, UserManager::COL_ID, 64)->order(UserManager::COL_ORDER)->fetchAll();
     }
 }

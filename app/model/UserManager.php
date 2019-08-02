@@ -64,7 +64,7 @@ class UserManager extends DatabaseManager
     public function getUserToHp()
     {
        try {
-            $this->database->table(self::TABLE_NAME)->order(self::COL_URL . " DESC");
+            $this->database->table(self::TABLE_NAME)->where(self::COL_HP, 1)->order(self::COL_URL . " DESC");
 
        } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
