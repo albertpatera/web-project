@@ -15,4 +15,14 @@ class HomepageManager extends DatabaseManager
     {
         return $this->database->table(ArticleManager::DB_TABLE)->order(ArticleManager::COL_ORDER . " DESC");
     }
+
+    public function getUserToHp()
+    {
+        try {
+            $this->database->table(UserManager::TABLE_NAME)->where(UserManager::COL_HP, 1)->order(UserManager::COL_ORDER)->fetchAll();
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
+        return $this->database->table(UserManager::TABLE_NAME)->where(UserManager::COL_HP, 1, UserManager::COL_ID, 64)->order(UserManager::COL_ORDER)->fetchAll();
+    }
 }

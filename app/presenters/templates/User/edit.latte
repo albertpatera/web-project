@@ -21,7 +21,7 @@
             <h4 class="card-title">{$userOutput->username|upper}</h4>
             <label class="badge badge-secondary">{$userOutput->role}</label>
             <p class="card-text"><a href="#">{$userOutput->url}</a></p>
-            <p class="card-text text-justify text-muted"><i>{$userOutput->sign}</i></p>
+            <p class="card-text text-justify text-muted"><i>{$userOutput->sign|noescape}</i></p>
             <a href="javascript:void(0)" class="btn btn-primary">See Profile</a>
 
         </div>
