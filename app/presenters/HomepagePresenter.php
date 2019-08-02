@@ -20,7 +20,15 @@ final class HomepagePresenter extends Nette\Application\UI\Presenter
     {
         $article = $this->articleValue->getArticles();
         $this->getTemplate()->articleValue = $article;
-        if (!($article = $this->articleValue->getArticles()))
+        if (!($article = $this->articleValue->getArticles())) {
             $this->error(); // Vyhazuje výjimku BadRequestException.
+
+        }
+
+        try {
+            $article = $this->articleValue->getArticles();
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
     }
 }
