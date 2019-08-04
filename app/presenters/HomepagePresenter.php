@@ -6,6 +6,7 @@ use App\Model\ArticleManager;
 use App\Model\HomepageManager;
 use App\Model\UserManager;
 use Nette;
+use Nette\ComponentModel\IComponent;
 
 
 final class HomepagePresenter extends Nette\Application\UI\Presenter
@@ -19,6 +20,24 @@ final class HomepagePresenter extends Nette\Application\UI\Presenter
      * @var ArticleManager @inject
      */
     public $articleValue;
+
+    /**
+     * @var HomepageManager @inject
+     */
+    public $websiteElementValue;
+
+    public function renderWebComp()
+    {
+        $website = $this->websiteElementValue->getWebsiteElement();
+
+        try {
+            $this->websiteElementValue->getWebsiteElement();
+        } catch (\Exception $e) {
+            throw new \Exception("fff" . $e->getMessage());
+        }
+
+        $this->getTemplate()->websiteElementValue = $website;
+    }
     public function renderWww()
     {
         $article = $this->articleValue->getArticles();
@@ -49,9 +68,35 @@ final class HomepagePresenter extends Nette\Application\UI\Presenter
             throw new \Exception($e->getMessage());
         }
 
+        //render for header and footer tag elements
 
+        $website = $this->websiteElementValue->getWebsiteElement();
 
+        try {
+            $this->websiteElementValue->getWebsiteElement();
+        } catch (\Exception $e) {
+            throw new \Exception("fff" . $e->getMessage());
+        }
 
+        $this->getTemplate()->websiteElementValue = $website;
+    }
+
+    protected function createComponentAddElement()
+    {
+        $form = new Nette\Application\UI\Form();
+        $form->addText('main_title', 'Main_title:')->setRequired();
+        $form->addText('title_image', 'Main Header Imge:')->setRequired();
+        $form->addSubmit('sbmtEl', 'Add Elememnt');
+        $form->onSuccess[] = [$this, 'addingElementSuccessed'];
+
+        return $form;
+    }
+
+    public function addingElementSuccessed(Nette\Application\UI\Form $form, array $values)
+    {
+
+       $web = $this->websiteElementValue->getElementHeader();
+       $this->getTemplate()->websiteElementValue = $web;
 
     }
 }
