@@ -8,9 +8,9 @@ application:
 
 # Konfigurace databázového připojení v rámci celé aplikace.
 database:
-    dsn: 'mysql:host=localhost;dbname=articles' # Typ, adresa a název databáze
-    user:  root
-    password: some_pass
+    dsn: 'mysql:host=localhost;dbname=web' # Typ, adresa a název databáze
+    user:  newuser
+    password: password
     options:
         lazy: yes
 

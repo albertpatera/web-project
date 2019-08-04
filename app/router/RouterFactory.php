@@ -23,6 +23,7 @@ final class RouterFactory
 		$router[] = new Route('/admin/', 'User:edit');
 		//$router[] = new Route('/admin/<presenter>/<action>', 'Article:default');
 		$router[] = new Route('/homepage/www', 'Homepage:www');
+		$router[] = new Route('/homepage/admin/advance/element', 'Homepage:webComp');
 		//$router[] = new Route('<url>', 'Article:add');
 		//$router[] = new Route('<url>/test', 'Article:add');
 		return $router;
