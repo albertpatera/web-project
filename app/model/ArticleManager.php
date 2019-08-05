@@ -31,6 +31,11 @@ class ArticleManager extends DatabaseManager
         return $this->database->table("new_table")->order(self::COL_ARTICLE_ID . ' DESC');
     }
 
+    public function getArticle($url)
+    {
+        return $this->database->table(self::DB_TABLE)->where(self::COL_ORDER, $url)->fetch();
+    }
+
     public function register($username) {
         try {
 
@@ -52,6 +57,11 @@ class ArticleManager extends DatabaseManager
         //if()
         $usernameOvereni = (!$username) ? 'ok..' : 'error';
 
+    }
+
+    public function getArticleFromCategory($url)
+    {
+        return $this->database->table("new_table")->where(self::COL_ORDER, $url)->fetchAll();
     }
 
 

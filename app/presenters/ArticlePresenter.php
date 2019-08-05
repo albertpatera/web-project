@@ -38,6 +38,12 @@ final class ArticlePresenter extends Presenter
         }
     }
 
+    public function renderEdit()
+    {
+        $detail = $this->articleValue->getArticles();
+        $this->getTemplate()->articleValue = $detail;
+    }
+
     protected function createComponentAddArticle()
     {
        $form = new Nette\Application\UI\Form();
@@ -62,6 +68,9 @@ final class ArticlePresenter extends Presenter
         $form->addText('title_image', 'main section image:')
             ->setRequired();
 
+        $form->addText('url', 'article url::')
+            ->setRequired();
+
 
         $form->addSubmit('send', 'Uložit a publikovat');
         $form->onSuccess[] = [$this, 'postFormSucceeded'];
@@ -78,30 +87,30 @@ final class ArticlePresenter extends Presenter
         } else {
             echo "eeee";
         }
-
-        //dumpe($post);
         $this->flashMessage("Příspěvek byl úspěšně publikován.", 'success');
-        //$this->redirect('show', $post->id);
-
 
     }
 
     public function addingArticleSuccessed(Nette\Application\UI\Form $form, array $values)
     {
-
-        //dump($values);
         try {
-            // Pokusí se vložit nového uživatele do databáze.
-            //$this->database->table(ArticleManager::DB_TABLE)->insert(["eeee"=> 'eeee']);
             $post = $this->database->table(ArticleManager::DB_TABLE)->insert($values);
-
-
         } catch (\Exception $e) {
             // Vyhodí výjimku, pokud uživatel s daným jménem již existuje.
             throw new \Exception("error inserting article");
         }
+    }
 
+    public function actionEdit($postId)
+    {
 
+        try {
+            $user = $this->articleValue->getArticleFromCategory($postId);
+        } catch (\Exception $e) {
+            throw new \Exception('ERROR:' . $e->getMessage());
+        }
+
+        $this->getTemplate()->userValue = $user;
     }
 }
 

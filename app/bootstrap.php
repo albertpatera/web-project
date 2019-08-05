@@ -19,4 +19,6 @@ $configurator->addConfig(__DIR__ . '/config/config.local.neon');
 
 $container = $configurator->createContainer();
 
+//added editor called Texyx!
+
 return $container;
