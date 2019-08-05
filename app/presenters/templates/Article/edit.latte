@@ -1,0 +1,32 @@
+
+{block content}
+    {block head}
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {/block}
+
+    {block body}
+        <div class="bg-light">
+            {foreach $articleValue as $item}
+                <a href="http://37.205.10.181:337/user/edit?user=blog" class="btn btn-primary ">Blog</a>
+                <div class="row pl-5">
+                    <div class="col-lg-8 float-md-right">
+                        <div class="alert bg-white">
+                            {if $item->title_image == NULL}
+                                <img src="http://www.avenuemagazine.com/wp-content/themes/avenue-magazine-new/images/no-image-available.png"
+                                     alt="no_image" style="width: 100%; height:350px;">
+                            {else} <img class="title-image img-thumbnail" title="{$item->title_image}" alt="{$item->title_image}" src="{$item->title_image}" style="width: 100%; height:350px;">{/if}
+                            <h2 class="title display-4">
+                                {$item->username|upper}
+                            </h2>
+                            <article class="article-wrapper">{$item->description|noescape}</article>
+                        </div>
+                    </div>
+
+                </div>
+            {/foreach}
+
+        </div>
+    {/block}
+{/block}

@@ -43,7 +43,7 @@ class UserManager extends DatabaseManager
 
     public function deleteUser($user)
     {
-        return $this->database->table(self::TABLE_NAME)->where(self::COL_ID, 15)->delete();
+        return $this->database->table(self::TABLE_NAME)->where(self::COL_ID, $user)->delete();
     }
 
     /**
@@ -63,6 +63,8 @@ class UserManager extends DatabaseManager
        // return $this->database->table(self::TABLE_NAME)->where(self::COL_URL, $url)->fetch();
     }
 
+
+
     public function getUserToHp()
     {
        try {
@@ -73,5 +75,17 @@ class UserManager extends DatabaseManager
        }
 
         return $this->database->table(self::TABLE_NAME)->where(self::COL_HP, 1)->order(self::COL_URL . " DESC");
+    }
+
+    public function authorize(array $permissions)
+    {
+        $user = $this->database->table(self::TABLE_NAME)->where(self::COL_USERNAME, 'albert')->fetch();
+        try {
+            $user = $this->database->table(self::TABLE_NAME)->where(self::COL_USERNAME, 'eeeeer')->fetch();
+
+
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
     }
 }

@@ -21,12 +21,14 @@
                                     <img src="http://www.avenuemagazine.com/wp-content/themes/avenue-magazine-new/images/no-image-available.png"
                                     alt="no_image" style="width: 100%; height:350px;">
                                 {else} <img class="title-image img-thumbnail" title="{$item->title_image}" alt="{$item->title_image}" src="{$item->title_image}" style="width: 100%; height:350px;">{/if}
-                                <h2 class="title display-4">{$item->username|upper}</h2>
+                                <h2 class="title display-4">
+                                    <a n:href="Article:edit $item->url">{$item->username|upper}</a>
+                                </h2>
                                 <article class="article-wrapper">{$item->description|noescape}</article>
                                 <hr>
                                 <h6 class="date display-6">Vytvořeno dne: </h6>
                                 <label class="badge badge-secondary ">{$item->date_created|date:'D. M. Y'}{sep}{$item->date_created|date:'h:i:s'}{/sep}</label>
-                                <label class="text-center"> Sekce:</label>
+                                <label class="text-center"> Sekce: <a n:href="Article:edit $item->url">{$item->url|upper}</a></label>
                             </div>
                         </div>
                         <div class="col-lg-4">
