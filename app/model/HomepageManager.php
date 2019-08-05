@@ -5,6 +5,7 @@ use App\Model\DatabaseManager;
 use Nette\Database\Table\Selection;
 use Nette\Database\Table;
 use App\Model\ArticleManager;
+use Tracy\Debugger;
 
 class HomepageManager extends DatabaseManager
 {
@@ -26,11 +27,11 @@ class HomepageManager extends DatabaseManager
     public function getElementHeader()
     {
         try {
-            $this->database->table(self::TABLE_EL_NAME)->order(self::COL_EL_ID)->where(self::COL_EL_TYPE, self::ELEMENT_TYPE_HEADER)->fetchAll();
+            $this->database->table(self::TABLE_EL_NAME)->order(self::COL_EL_ID)->where(self::COL_EL_TYPE, self::ELEMENT_TYPE_HEADER)->limit(1)->fetchAll();
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }
-        return $this->database->table(self::TABLE_EL_NAME)->order(self::COL_EL_ID)->where(self::COL_EL_TYPE, self::ELEMENT_TYPE_HEADER)->fetchAll();
+        return $this->database->table(self::TABLE_EL_NAME)->order(self::COL_EL_ID)->where(self::COL_EL_TYPE, self::ELEMENT_TYPE_HEADER)->limit(1)->fetchAll();
 
     }
 
@@ -60,12 +61,14 @@ class HomepageManager extends DatabaseManager
         return $this->database->table(UserManager::TABLE_NAME)->where(UserManager::COL_HP, 1, UserManager::COL_ID, 64)->order(UserManager::COL_ORDER)->fetchAll();
     }
 
-    public function websiteElement( array $el)
+    public function websiteElement(array $eleArr)
     {
         try {
-            $this->database->table(self::TABLE_EL_NAME)->insert([$el]);
-            echo "super article inserted";
-            dump($el);
+
+            //$this->database->table(self::TABLE_EL_NAME)->insert([$eleArr]);
+            $this->database->table(self::TABLE_EL_NAME)->insert([$eleArr]);
+            echo "<h3>super</h3>";
+
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }
@@ -75,4 +78,5 @@ class HomepageManager extends DatabaseManager
     {
         return $this->database->table(self::TABLE_EL_NAME)->fetchAll();
     }
+
 }
