@@ -26,11 +26,11 @@ class HomepageManager extends DatabaseManager
     public function getElementHeader()
     {
         try {
-            $this->database->table(self::TABLE_EL_NAME)->order(self::COL_EL_ID)->where(self::COL_EL_TYPE, self::ELEMENT_TYPE_HEADER)->fetchAll();
+            $this->database->table(self::TABLE_EL_NAME)->order(self::COL_EL_ID)->where(self::COL_EL_TYPE, self::ELEMENT_TYPE_HEADER)->limit(1)->fetchAll();
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }
-        return $this->database->table(self::TABLE_EL_NAME)->order(self::COL_EL_ID)->where(self::COL_EL_TYPE, self::ELEMENT_TYPE_HEADER)->fetchAll();
+        return $this->database->table(self::TABLE_EL_NAME)->order(self::COL_EL_ID)->where(self::COL_EL_TYPE, self::ELEMENT_TYPE_HEADER)->limit(1)->fetchAll();
 
     }
 

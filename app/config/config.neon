@@ -10,7 +10,7 @@ application:
 database:
     dsn: 'mysql:host=localhost;dbname=web' # Typ, adresa a název databáze
     user:  newuser
-    password: password
+    password: pltkrcni
     options:
         lazy: yes
 

@@ -16,7 +16,7 @@ parameters:
 # Konfigurace databázového připojení v rámci celé aplikace.
 database:
     dsn: 'mysql:host=localhost;dbname=web' # Typ, adresa a název databáze
-    user: web  # Uživatelské jméno
+    user: newuser  # Uživatelské jméno
     password: password # Heslo
     options:
        lazy: yes

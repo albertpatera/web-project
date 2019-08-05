@@ -24,14 +24,19 @@ final class HomepagePresenter extends Nette\Application\UI\Presenter
     /**
      * @var HomepageManager @inject
      */
-    public $websiteElementValue;
+    public $websiteElementValueHeader;
+
+    /**
+     * @var HomepageManager @inject
+     */
+    public $websiteElementValueFooter;
 
     public function renderWebComp()
     {
-        $website = $this->websiteElementValue->getWebsiteElement();
+        $website = $this->websiteElementValueHeader->getElementHeader();
 
         try {
-            $this->websiteElementValue->getWebsiteElement();
+            $this->websiteElementValueHeader->getElementHeader();
         } catch (\Exception $e) {
             throw new \Exception("fff" . $e->getMessage());
         }
@@ -70,15 +75,15 @@ final class HomepagePresenter extends Nette\Application\UI\Presenter
 
         //render for header and footer tag elements
 
-        $website = $this->websiteElementValue->getWebsiteElement();
+        $website = $this->websiteElementValueHeader->getWebsiteElement();
 
         try {
-            $this->websiteElementValue->getWebsiteElement();
+            $this->websiteElementValueHeader->getWebsiteElement();
         } catch (\Exception $e) {
             throw new \Exception("fff" . $e->getMessage());
         }
 
-        $this->getTemplate()->websiteElementValue = $website;
+        $this->getTemplate()->websiteElementValueHeader = $website;
     }
 
     protected function createComponentAddElement()
@@ -95,8 +100,11 @@ final class HomepagePresenter extends Nette\Application\UI\Presenter
     public function addingElementSuccessed(Nette\Application\UI\Form $form, array $values)
     {
 
-       $web = $this->websiteElementValue->getElementHeader();
-       $this->getTemplate()->websiteElementValue = $web;
+       $web_header = $this->websiteElementValueHeader->getElementHeader();
+       $this->getTemplate()->websiteElementValueHeader = $web_header;
+
+       $web_footer = $this->websiteElementValueFooter->getElementFooter();
+       $this->getTemplate()->websiteElementValueFooter = $web_footer;
 
     }
 }

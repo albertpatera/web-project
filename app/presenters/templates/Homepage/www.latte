@@ -8,11 +8,7 @@
 
     {block body}
         {block header}
-            {foreach $websiteElementValue as $page}
-                <header>
-                    <img src="{$page->title_image}" alt="main_image" style="width:100%; height:570px">
-                </header>
-                {/foreach}
+            {include 'header.latte'}
         {/block}
 
         <div class="bg-light">
@@ -50,6 +46,10 @@
                         </div>
                     </div>
             {/foreach}
+
+            {block footer|stripHTML|upper}
+                {include 'footer.latte'}
+            {/block}
         </div>
     {/block}
 {/block}
