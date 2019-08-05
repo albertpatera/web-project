@@ -5,6 +5,7 @@ namespace App\Presenters;
 use App\Model\ArticleManager;
 use App\Model\HomepageManager;
 use App\Model\UserManager;
+use App\Model\DatabaseManager;
 use Nette;
 use Nette\ComponentModel\IComponent;
 
@@ -30,6 +31,15 @@ final class HomepagePresenter extends Nette\Application\UI\Presenter
      * @var HomepageManager @inject
      */
     public $websiteElementValueFooter;
+
+    public $database;
+
+
+
+    public function __construct()
+    {
+        parent::__construct();
+    }
 
     public function renderWebComp()
     {
@@ -99,12 +109,18 @@ final class HomepagePresenter extends Nette\Application\UI\Presenter
 
     public function addingElementSuccessed(Nette\Application\UI\Form $form, array $values)
     {
+        try {
+            // Pokusí se vložit nového uživatele do databáze.
+            //$this->database->table(ArticleManager::DB_TABLE)->insert(["eeee"=> 'eeee']);
+            //$post = $this->database->([$values]);
+            //dump($values);
+            $this->websiteElementValueHeader->websiteElement($values);
+            dump($values);
 
-       $web_header = $this->websiteElementValueHeader->getElementHeader();
-       $this->getTemplate()->websiteElementValueHeader = $web_header;
 
-       $web_footer = $this->websiteElementValueFooter->getElementFooter();
-       $this->getTemplate()->websiteElementValueFooter = $web_footer;
-
+        } catch (\Exception $e) {
+            // Vyhodí výjimku, pokud uživatel s daným jménem již existuje.
+            throw new \Exception($e->getMessage());
+        }
     }
 }
