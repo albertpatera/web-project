@@ -9,7 +9,7 @@ use Nette\Application\UI\Presenter;
 use Tracy\Debugger;
 
 
-final class UserPresenter extends Presenter
+final class AdminPresenter extends Presenter
 {
     /**
      * @var UserManager @inject
@@ -20,34 +20,23 @@ final class UserPresenter extends Presenter
      * @var UserManager @inject
      */
     public $userValue;
-    /**
-     * @var UserManager @inject
-     */
-    //public $records;
 
     /**
      * @var UserManager @inject
      */
     private $model;
 
-
-    //session workflow
-    /**
-     * @var Nette\Http\Session
-     */
-    private $session;
-    /**
-     * @var Nette\Http\Session;
-     */
-    private $sessionSection;
-
     /**
      * @var AdminManager @inject
      */
-    private $adminManager;
+    private $adminValue;
+
+
+    //session workflow
+
     public function __construct(Nette\Http\Session $session)
     {
-        $this->sessionSection = 'albert';
+   //     $this->sessionSection = 'albert';
 
     }
 
@@ -89,52 +78,60 @@ final class UserPresenter extends Presenter
 
     }
 
-    protected function createComponentAddUser()
+    protected function createComponentLoginUser()
     {
         /**
          * @TODO pak dodelat admin. role v db do selectu
          * tady to funguje
          */
-        $formAddUser = new Nette\Application\UI\Form();
-        $formAddUser->addText('username', 'Username')->setRequired();
-        $formAddUser->addText('role', 'role:')->setRequired();
-        $formAddUser->addText('url', 'url:')->setRequired();
-        $formAddUser->addTextArea('sign', 'About author ')->setRequired();
-        $formAddUser->addText('prof_image', 'Profil image: ')
-            ->setRequired();
-        $formAddUser->addSubmit('submitAddU', 'add user');
-        $formAddUser->onSuccess[] = [$this, 'addingUserSuccessed'];
+        $login = new Nette\Application\UI\Form();
+        $login->addText('username', 'Username:')->setRequired();
+        $login->addPassword('password', 'Password');
+        $login->addSubmit('submit', 'login');
+        $login->onSuccess[] = [$this, 'loginSuccessed'];
 
-        return $formAddUser;
+        return $login;
     }
 
-    protected function createComponentEditForm()
+    public function loginSuccessed(Nette\Application\UI\Form $login, array $values)
     {
-        $formEditUser = new Nette\Application\UI\Form();
-        $formEditUser->addText('username', 'Username')->setRequired()->setDefaultValue("eee");
+    /*   try {
+            $this->userManager->getArticle();
+       } catch (\Exception $e) {
+           throw new \Exception($e->getMessage());
+       }*/
+        $usernameValue = $this->getParameter('username');
+        if($values["username"] == "admin")
+        {
 
-        $formEditUser->addText('role', 'role:')->setRequired();
-        $formEditUser->addText('url', 'url:')->setRequired();
-        $formEditUser->addTextArea('sign', 'About author:')
-            ->setRequired();
-        $formEditUser->addSubmit('submitAddU', 'Privat uzivatele');
-        $formEditUser->onSuccess[] = [$this, 'editUserSuccessed'];
+            $this->flashMessage('Login Successfully>', 'success');
+        } else {
+            echo "error";
+            $this->flashMessage('login failed ! maybe user name does not exists', 'danger');
+        }
 
 
-        return $formEditUser;
     }
 
-    public function actiionEdit()
+    public function renderDefault($user = NULL)
+    {
+        $website = $this->userValue->getUserByRole($user);
+
+        try {
+            $this->userValue->getUserByRole();
+        } catch (\Exception $e) {
+            throw new \Exception("fff" . $e->getMessage());
+        }
+
+        $this->getTemplate()->userValue = $website;
+    }
+
+
+
+    /*public function actiionEdit()
     {
         $postId = $this->getParameter('user');
-    }
-
-
-
-    public function editUserSuccessed(Nette\Application\UI\Form $formEditUser, Nette\Utils\ArrayHash $values)
-    {
-        echo "eeeewewqrq";
-    }
+    }*/
 
     public function addingUserSuccessed(Nette\Application\UI\Form  $formAddUser, array $values)
     {

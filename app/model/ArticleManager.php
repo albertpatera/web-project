@@ -20,7 +20,9 @@ class ArticleManager extends DatabaseManager
             COL_ORDER = 'url',
             COL_CONTENT = 'description',
             DB_TABLE = 'article',
-            COL_PEREX = 'description';
+            COL_PEREX = 'description',
+            COL_DATE_CREATED = 'date_created' ;
+
     /**
      * @var ArticleManager @inject
      */
@@ -62,6 +64,23 @@ class ArticleManager extends DatabaseManager
     public function getArticleFromCategory($url)
     {
         return $this->database->table("new_table")->where(self::COL_ORDER, $url)->fetchAll();
+    }
+
+    public function getArticleForNow()
+    {
+        $dateNow = new \DateTime();
+        $dateFinal = $dateNow->format('Y-m-d');
+
+        try {
+             $this->database->table(self::DB_TABLE)->where(self::COL_ORDER, $dateFinal)->fetchAll();
+            echo "super, jede toooo";
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
+
+        return $this->database->table("new_table")->where(self::COL_DATE_CREATED, $dateFinal)->fetchAll();
+
+
     }
 
 

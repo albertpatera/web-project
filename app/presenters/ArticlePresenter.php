@@ -14,6 +14,10 @@ final class ArticlePresenter extends Presenter
     /**
      * @var ArticleManager @inject     */
     public $articleValue;
+    /**
+     * @var ArticleManager @inject
+     */
+    public $articleValueNow;
 
     /**
      * @var ArticleManager @inject
@@ -36,6 +40,14 @@ final class ArticlePresenter extends Presenter
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }
+
+        try {
+            $articleForNow = $this->articleValueNow->getArticleForNow();
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
+
+        $this->getTemplate()->articleValueNow = $articleForNow;
     }
 
     public function renderEdit()
