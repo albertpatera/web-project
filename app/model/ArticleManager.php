@@ -28,7 +28,7 @@ class ArticleManager extends DatabaseManager
 
     public function getArticles()
     {
-        return $this->database->table("new_table")->order(self::COL_ARTICLE_ID . ' DESC');
+        return $this->database->table("new_table")->order(self::COL_ARTICLE_ID . ' DESC')->fetchAll();
     }
 
     public function getArticle($url)

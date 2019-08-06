@@ -4,7 +4,7 @@ parameters:
         host: localhost
         port: 3306
         dbname: test
-        user: newuser
+        user: newuser->
         password: password
         #dbname: articles
 
@@ -16,7 +16,7 @@ parameters:
 # Konfigurace databázového připojení v rámci celé aplikace.
 database:
     dsn: 'mysql:host=localhost;dbname=web' # Typ, adresa a název databáze
-    user: newuser  # Uživatelské jméno
+    user: web  # Uživatelské jméno
     password: password # Heslo
     options:
        lazy: yes
