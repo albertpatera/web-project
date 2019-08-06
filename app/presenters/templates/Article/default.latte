@@ -8,34 +8,64 @@
    <h1 n:block="title" class="test-center alert alert-success">Adding articles</h1>
    <h2><a n:href="User:add">User manager</a></h2>
    {control postForm}
-<table class="table">
-      {foreach $articleValue as $articleHeader}
-      <tr n:if="$articleHeader">
-         <th>#</th>
-         <th>Main Title</th>
-         <th>description</th>
-         <th>profile</th>
-         <th>action</th>
-      </tr>
-      {/foreach}
-      {foreach $articleValue as $article}
+<div class="container-fluid">
+    <div class="row">
+        <table class="table">
 
-      <tr>
-         <td>{$article->id}</td>
-         <td>{$article->username}</td>
-         <td>{$article->description}</td>
-         <td>
-            <a n:href="Article:default">link</a>
-         </td>
-         <td>
-           | <a n:href="Article:edit">Edit</a>
-           | <a n:href="Article:remove">X</a>
-           | <a n:href="Article:visible">visible</a> |
-         </td>
-      </tr>
+          {foreach $articleValue as $articleHeader}
+          <tr n:if="$articleHeader">
+             <th>#</th>
+             <th>Main Title</th>
+             <th>description</th>
+             <th>profile</th>
+             <th>action</th>
+          </tr>
+          {/foreach}
+        <h3>All Articles</h3>
+          {foreach $articleValue as $article}
+
+          <tr>
+             <td>{$article->id}</td>
+             <td>{$article->username}</td>
+             <td>{$article->description}</td>
+             <td>
+                <a n:href="Article:default">link</a>
+             </td>
+             <td>
+               | <a n:href="Article:edit">Edit</a>
+               | <a n:href="Article:remove">X</a>
+               | <a n:href="Article:visible">visible</a> |
+             </td>
+          </tr>
+
+    {/foreach}
+
+    <hr>
+<div class="row">
+    <div class="col-md-10">
+    {foreach $articleValueNow as $articleDayly}
+        <tr>
+            <td>{$article->id}</td>
+            <td>{$article->username}</td>
+            <td>{$article->description}</td>
+            <td>
+                <a n:href="Article:default">link</a>
+            </td>
+            <td>
+                | <a n:href="Article:edit">Edit</a>
+                | <a n:href="Article:remove">X</a>
+                | <a n:href="Article:visible">visible</a> |
+            </td>
+        </tr>
+    {/foreach}
 
 
-{/foreach}
    </table>
+    </div>
+
+    </div>
+    </div>
+</div>
+
 {/block}
 

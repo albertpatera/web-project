@@ -6,7 +6,7 @@ use Nette\Database\Table\Selection;
 use Nette\Utils\ArrayHash;
 use Tracy\Debugger;
 
-class UserManager extends DatabaseManager
+class AdminManager extends DatabaseManager
 {
     CONST
         TABLE_NAME = 'user',
@@ -15,27 +15,6 @@ class UserManager extends DatabaseManager
         COL_ID = 'id',
         COL_URL = 'url',
         COL_HP = 'hp';
-    public function insertUser(array $username)
-    {
-        try {
-            if(empty($username[self::COL_ID])) {
-                $this->database->table(self::TABLE_NAME)->insert([$username]);
-                Debugger::barDump('inserting..');
-            } else {
-                $this->database->table(self::TABLE_NAME)->where(self::COL_ID, $username[self::COL_ID])->update([$username]);
-                Debugger::barDump("updating");
-            }
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage());
-        }
-    }
-
-
-    public function updateUser($user)
-    {
-        return $this->database->table(self::TABLE_NAME)->update($user);
-    }
-
     public function getUsers()
     {
         return $this->database->table(self::TABLE_NAME)->order(self::COL_URL . " DESC");
@@ -46,8 +25,6 @@ class UserManager extends DatabaseManager
         return $this->database->table(self::TABLE_NAME)->where(self::COL_ID, $user)->delete();
     }
 
-
-
     /**
      * @param null $url
      * @return array|Table\IRow[]
@@ -56,25 +33,25 @@ class UserManager extends DatabaseManager
      */
     public function getArticle($url = null)
     {
-       try {
-           return $this->database->table(self::TABLE_NAME)->where(self::COL_URL, $url)->fetchAll();
+        try {
+            return $this->database->table(self::TABLE_NAME)->where(self::COL_URL, $url)->fetchAll();
 
-       } catch (\Exception $e) {
-           throw new \Exception('url does not exists');
-       }
-       // return $this->database->table(self::TABLE_NAME)->where(self::COL_URL, $url)->fetch();
+        } catch (\Exception $e) {
+            throw new \Exception('url does not exists');
+        }
+        // return $this->database->table(self::TABLE_NAME)->where(self::COL_URL, $url)->fetch();
     }
 
 
 
     public function getUserToHp()
     {
-       try {
+        try {
             $this->database->table(self::TABLE_NAME)->where(self::COL_HP, 1)->order(self::COL_URL . " DESC");
 
-       } catch (\Exception $e) {
+        } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
-       }
+        }
 
         return $this->database->table(self::TABLE_NAME)->where(self::COL_HP, 1)->order(self::COL_URL . " DESC");
     }

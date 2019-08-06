@@ -123,4 +123,43 @@ final class HomepagePresenter extends Nette\Application\UI\Presenter
             throw new \Exception($e->getMessage());
         }
     }
+
+    protected function createComponentLoginUser()
+    {
+        /**
+         * @TODO pak dodelat admin. role v db do selectu
+         * tady to funguje
+         */
+        $login = new Nette\Application\UI\Form();
+        $login->addText('username', 'Username:')->setRequired();
+        $login->addPassword('password', 'Password');
+        $login->addSubmit('submit', 'login');
+        $login->onSuccess[] = [$this, 'loginSuccessed'];
+
+        return $login;
+    }
+
+    public function loginSuccessed(Nette\Application\UI\Form $login, array $values)
+    {
+        /*   try {
+                $this->userManager->getArticle();
+           } catch (\Exception $e) {
+               throw new \Exception($e->getMessage());
+           }*/
+        $usernameValue = $this->getParameter('username');
+        if($values["username"] == "admin")
+        {
+            $this->flashMessage('Login Successfully', 'success');
+        } else {
+            echo "error";
+            $this->flashMessage('login failed ! maybe user name does not exists', 'danger');
+        }
+
+        try {
+            echo "value";
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
+
+    }
 }
