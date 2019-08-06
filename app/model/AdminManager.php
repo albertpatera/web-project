@@ -14,7 +14,9 @@ class AdminManager extends DatabaseManager
         COL_ORDER = 'id',
         COL_ID = 'id',
         COL_URL = 'url',
-        COL_HP = 'hp';
+        COL_HP = 'hp',
+        COL_ROLE = 'role';
+
     public function getUsers()
     {
         return $this->database->table(self::TABLE_NAME)->order(self::COL_URL . " DESC");
@@ -31,15 +33,9 @@ class AdminManager extends DatabaseManager
      * @throws \Exception
      * @TODO I must solve how to print anly one item from database via ->fetch();
      */
-    public function getArticle($url = null)
+    public function getUserByRole($url = null)
     {
-        try {
-            return $this->database->table(self::TABLE_NAME)->where(self::COL_URL, $url)->fetchAll();
-
-        } catch (\Exception $e) {
-            throw new \Exception('url does not exists');
-        }
-        // return $this->database->table(self::TABLE_NAME)->where(self::COL_URL, $url)->fetch();
+         return $this->database->table(self::TABLE_NAME)->where(self::COL_ROLE, $url)->fetchAll();
     }
 
 
@@ -61,7 +57,6 @@ class AdminManager extends DatabaseManager
         $user = $this->database->table(self::TABLE_NAME)->where(self::COL_USERNAME, 'albert')->fetch();
         try {
             $user = $this->database->table(self::TABLE_NAME)->where(self::COL_USERNAME, 'eeeeer')->fetch();
-
 
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());

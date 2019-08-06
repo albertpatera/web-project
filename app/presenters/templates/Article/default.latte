@@ -10,7 +10,8 @@
    {control postForm}
 <div class="container-fluid">
     <div class="row">
-        <table class="table">
+        <div class="col-md-10">
+            <table class="table">
 
           {foreach $articleValue as $articleHeader}
           <tr n:if="$articleHeader">
@@ -39,11 +40,21 @@
           </tr>
 
     {/foreach}
-
+            </table>
     <hr>
 <div class="row">
     <div class="col-md-10">
-    {foreach $articleValueNow as $articleDayly}
+        <h3>All  posts per 1 day</h3>
+        <table class="table">
+
+            <tr n:if="$articleHeader">
+                <th>#</th>
+                <th>Main Title</th>
+                <th>description</th>
+                <th>profile</th>
+                <th>action</th>
+            </tr>
+        {foreach $articleValueNow as $articleDayly}
         <tr>
             <td>{$article->id}</td>
             <td>{$article->username}</td>
@@ -58,10 +69,7 @@
             </td>
         </tr>
     {/foreach}
-
-
-   </table>
-    </div>
+    </table>
 
     </div>
     </div>

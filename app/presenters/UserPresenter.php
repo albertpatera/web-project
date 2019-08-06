@@ -2,6 +2,7 @@
 
 namespace App\Presenters;
 
+use App\Model\AdminManager;
 use App\Model\UserManager;
 use Nette;
 use Nette\Application\UI\Presenter;
@@ -39,6 +40,11 @@ final class UserPresenter extends Presenter
      * @var Nette\Http\Session;
      */
     private $sessionSection;
+
+    /**
+     * @var AdminManager @inject
+     */
+    private $adminManager;
     public function __construct(Nette\Http\Session $session)
     {
         $this->sessionSection = 'albert';

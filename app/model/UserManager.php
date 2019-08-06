@@ -46,6 +46,12 @@ class UserManager extends DatabaseManager
         return $this->database->table(self::TABLE_NAME)->where(self::COL_ID, $user)->delete();
     }
 
+    public function getUserByRole($url = null)
+    {
+
+        return $this->database->table(self::TABLE_NAME)->where(AdminManager::COL_ROLE, $url)->fetchAll();
+    }
+
 
 
     /**
@@ -64,6 +70,8 @@ class UserManager extends DatabaseManager
        }
        // return $this->database->table(self::TABLE_NAME)->where(self::COL_URL, $url)->fetch();
     }
+
+
 
 
 

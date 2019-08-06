@@ -2,6 +2,7 @@
 
 namespace App\Presenters;
 
+use App\Model\AdminManager;
 use App\Model\UserManager;
 use Nette;
 use Nette\Application\UI\Presenter;
@@ -19,15 +20,16 @@ final class AdminPresenter extends Presenter
      * @var UserManager @inject
      */
     public $userValue;
-    /**
-     * @var UserManager @inject
-     */
-    //public $records;
 
     /**
      * @var UserManager @inject
      */
     private $model;
+
+    /**
+     * @var AdminManager @inject
+     */
+    private $adminValue;
 
 
     //session workflow
@@ -111,13 +113,17 @@ final class AdminPresenter extends Presenter
 
     }
 
-    public function renderDefault($user)
+    public function renderDefault($user = NULL)
     {
+        $website = $this->userValue->getUserByRole($user);
+
         try {
-            $this->userManager->getArticle($user);
+            $this->userValue->getUserByRole();
         } catch (\Exception $e) {
-            throw new \Exception($e->getMessage());
+            throw new \Exception("fff" . $e->getMessage());
         }
+
+        $this->getTemplate()->userValue = $website;
     }
 
 
