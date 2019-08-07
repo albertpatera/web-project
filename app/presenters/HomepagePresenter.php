@@ -8,6 +8,7 @@ use App\Model\UserManager;
 use App\Model\DatabaseManager;
 use Nette;
 use Nette\ComponentModel\IComponent;
+use Texy\Texy;
 
 
 final class HomepagePresenter extends Nette\Application\UI\Presenter
@@ -55,6 +56,16 @@ final class HomepagePresenter extends Nette\Application\UI\Presenter
     }
     public function renderWww()
     {
+        $texy = new Texy();
+        $texy->imageModule->root = 'images/';  // specify image folder
+        $texy->allowed['phrase/ins'] = true;
+        $texy->allowed['phrase/del'] = true;
+        $texy->allowed['phrase/sup'] = true;
+        $texy->allowed['phrase/sub'] = true;
+        $texy->allowed['phrase/cite'] = true;
+        $texy->allowed['emoticon'] = true;
+        $output = $texy->process("albert :-)");
+        echo $output;
         $article = $this->articleValue->getArticles();
         $this->getTemplate()->articleValue = $article;
         try {

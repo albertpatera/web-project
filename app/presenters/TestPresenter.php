@@ -65,9 +65,12 @@ final class TestPresenter extends Nette\Application\UI\Presenter
         $texy->allowed['phrase/sup'] = true;
         $texy->allowed['phrase/sub'] = true;
         $texy->allowed['phrase/cite'] = true;
+        $texy->allowed['emoticon'] = true;
+
+
         // processing
         //$text = file_get_contents('syntax.texy');
-        $text = '**albertpatera**';
+        $text = ":-) ";
         $output = $texy->process($text);  // that's all folks!
         echo $output;
         dump($output);

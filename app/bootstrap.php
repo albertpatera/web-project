@@ -1,6 +1,12 @@
 <?php
-
+use Tester\Assert;;
 require __DIR__ . '/../vendor/autoload.php';
+$texy = new Texy\Texy;
+$texy->htmlOutputModule->lineWrap = 180;
+$texy->emoticonModule->root = 'images/images/';
+$texy->emoticonModule->class = 'smiley';
+$texy->allowed['emoticon'] = true;
+
 
 $configurator = new Nette\Configurator;
 $configurator->setDebugMode(TRUE);

@@ -9,6 +9,7 @@
     {block body}
         <div class="bg-light">
             {foreach $articleValue as $item}
+                {if $item->url}
                 <div class="row pl-5">
                     <div class="col-lg-8 float-md-right">
                         <div class="alert bg-white">
@@ -19,12 +20,17 @@
                             <h2 class="title display-4">
                                 {$item->username|upper}
                             </h2>
-                            <article class="article-wrapper">{$item->description|noescape}</article>
+                            <article class="article-wrapper">{$item->description|noescape|texy}</article>
                         </div>
                     </div>
 
                 </div>
+
+                {else}
+
+                {/if}
             {/foreach}
+
 
         </div>
     {/block}

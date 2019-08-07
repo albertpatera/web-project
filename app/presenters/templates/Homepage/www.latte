@@ -49,9 +49,15 @@
                     </div>
             {/foreach}
 
-            {block footer|stripHTML|upper}
-                {include 'footer.latte'}
-            {/block}
+            {foreach $websiteElementValueHeader as $page_footer}
+                <div class="row">
+                    <div class="col">
+                        <footer class="footer bg-light p-5" id="page_footer-{$page_footer}">
+                            <p class="text-center text-muted bg-light"> {$page_footer->main_title|upper}</p>
+                        </footer>
+                    </div>
+                </div>
+            {/foreach}
         </div>
     {/block}
 {/block}

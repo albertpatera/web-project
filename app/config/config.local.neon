@@ -23,3 +23,5 @@ database:
 
 extensions:
 	texy: Lookyman\NetteTexy\DI\TexyExtension
+	    #texy: Texy
+
