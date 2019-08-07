@@ -23,7 +23,7 @@
                                 <h2 class="title display-4">
                                     <a n:href="Article:edit $item->url">{$item->username|upper}</a>
                                 </h2>
-                                <article class="article-wrapper">{$item->description|noescape}</article>
+                                <article class="article-wrapper">{$item->description|noescape|texy}</article>
                                 <hr>
                                 <h6 class="date display-6">Vytvořeno dne: </h6>
                                 <label class="badge badge-secondary ">{$item->date_created|date:'D. M. Y'}{sep}{$item->date_created|date:'h:i:s'}{/sep}</label>

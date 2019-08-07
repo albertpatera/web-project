@@ -52,22 +52,25 @@
                 <th>Main Title</th>
                 <th>description</th>
                 <th>profile</th>
+                <th>date</th>
                 <th>action</th>
             </tr>
         {foreach $articleValueNow as $articleDayly}
         <tr>
-            <td>{$article->id}</td>
-            <td>{$article->username}</td>
-            <td>{$article->description}</td>
+            <td>{$articleDayly->id}</td>
+            <td>{$articleDayly->username}</td>
+            <td>{$articleDayly->description|texy}</td>
             <td>
                 <a n:href="Article:default">link</a>
             </td>
+            <td>{$articleDayly->date_created}</td>
             <td>
                 | <a n:href="Article:edit">Edit</a>
                 | <a n:href="Article:remove">X</a>
                 | <a n:href="Article:visible">visible</a> |
             </td>
         </tr>
+
     {/foreach}
     </table>
 

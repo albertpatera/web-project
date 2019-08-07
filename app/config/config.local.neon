@@ -20,3 +20,6 @@ database:
     password: password # Heslo
     options:
        lazy: yes
+
+extensions:
+	texy: Lookyman\NetteTexy\DI\TexyExtension

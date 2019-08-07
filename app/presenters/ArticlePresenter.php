@@ -32,6 +32,7 @@ final class ArticlePresenter extends Presenter
     {
         $article = $this->articleValue->getArticles();
         $this->getTemplate()->articleValue = $article;
+        $this->getTemplate()->articleValueNow = $article;
         if (!($article = $this->articleValue->getArticles()))
             $this->error(); // Vyhazuje výjimku BadRequestException.
 

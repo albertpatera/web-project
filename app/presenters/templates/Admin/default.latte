@@ -15,7 +15,7 @@
    {control loginUser}
    {foreach $userValue as $role}
        {$role->username}
-         {if $role->roleghh == "admin"}
+         {if $role->role == "admin"}
                {include 'defrefre.latte'}
           {else}
                {include 'user.latte'}

@@ -9,6 +9,7 @@ use Nette\Application\UI\Presenter;
 use Tracy\Debugger;
 
 
+
 final class AdminPresenter extends Presenter
 {
     /**
