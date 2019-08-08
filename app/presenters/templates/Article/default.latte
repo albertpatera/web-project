@@ -13,15 +13,14 @@
         <div class="col-md-10">
             <table class="table">
 
-          {foreach $articleValue as $articleHeader}
-          <tr n:if="$articleHeader">
+          <tr>
              <th>#</th>
              <th>Main Title</th>
              <th>description</th>
              <th>profile</th>
              <th>action</th>
           </tr>
-          {/foreach}
+
         <h3>All Articles</h3>
           {foreach $articleValue as $article}
 
@@ -47,27 +46,30 @@
         <h3>All  posts per 1 day</h3>
         <table class="table">
 
-            <tr n:if="$articleHeader">
+            <tr>
                 <th>#</th>
                 <th>Main Title</th>
                 <th>description</th>
                 <th>profile</th>
+                <th>date</th>
                 <th>action</th>
             </tr>
         {foreach $articleValueNow as $articleDayly}
         <tr>
-            <td>{$article->id}</td>
-            <td>{$article->username}</td>
-            <td>{$article->description}</td>
+            <td>{$articleDayly->id}</td>
+            <td>{$articleDayly->username}</td>
+            <td>{$articleDayly->description|noescape|texy}</td>
             <td>
                 <a n:href="Article:default">link</a>
             </td>
+            <td>{$articleDayly->date_created}</td>
             <td>
                 | <a n:href="Article:edit">Edit</a>
                 | <a n:href="Article:remove">X</a>
                 | <a n:href="Article:visible">visible</a> |
             </td>
         </tr>
+
     {/foreach}
     </table>
 

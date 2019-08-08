@@ -69,16 +69,16 @@ class ArticleManager extends DatabaseManager
     public function getArticleForNow()
     {
         $dateNow = new \DateTime();
-        $dateFinal = $dateNow->format('Y-m-d');
+        $dateFinal = $dateNow->format('Y-m-d 00:00:00');
 
         try {
-             $this->database->table(self::DB_TABLE)->where(self::COL_ORDER, $dateFinal)->fetchAll();
+             $this->database->table(self::DB_TABLE)->where(self::COL_ORDER, $dateFinal)->order(self::COL_ORDER . ' DESC')->fetchAll();
             echo "super, jede toooo";
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }
 
-        return $this->database->table("new_table")->where(self::COL_DATE_CREATED, $dateFinal)->fetchAll();
+        return $this->database->table("new_table")->where(self::COL_DATE_CREATED, $dateFinal)->order(self::COL_ORDER . ' DESC')->fetchAll();
 
 
     }

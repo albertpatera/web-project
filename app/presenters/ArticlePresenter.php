@@ -32,6 +32,7 @@ final class ArticlePresenter extends Presenter
     {
         $article = $this->articleValue->getArticles();
         $this->getTemplate()->articleValue = $article;
+        $this->getTemplate()->articleValueNow = $article;
         if (!($article = $this->articleValue->getArticles()))
             $this->error(); // Vyhazuje výjimku BadRequestException.
 
@@ -50,9 +51,9 @@ final class ArticlePresenter extends Presenter
         $this->getTemplate()->articleValueNow = $articleForNow;
     }
 
-    public function renderEdit()
+    public function renderEdit($postId)
     {
-        $detail = $this->articleValue->getArticles();
+        $detail = $this->articleValue->getArticleFromCategory($postId);
         $this->getTemplate()->articleValue = $detail;
     }
 
@@ -73,7 +74,9 @@ final class ArticlePresenter extends Presenter
         $form->addText('username', 'Titulek:')
             ->setRequired();
         $form->addTextArea('description', 'description')
-           ->setRequired();
+           ->setRequired()
+            ->setAttribute('rows', 25)
+            ->setAttribute('cols', 30);
 
         $form->addText('date_created', 'date_created')->setType('date')
            ->setRequired();
@@ -122,7 +125,10 @@ final class ArticlePresenter extends Presenter
             throw new \Exception('ERROR:' . $e->getMessage());
         }
 
-        $this->getTemplate()->userValue = $user;
+        $this->getTemplate()->articleValue = $user;
     }
+
 }
+
+
 

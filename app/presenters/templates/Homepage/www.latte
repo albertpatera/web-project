@@ -23,7 +23,7 @@
                                 <h2 class="title display-4">
                                     <a n:href="Article:edit $item->url">{$item->username|upper}</a>
                                 </h2>
-                                <article class="article-wrapper">{$item->description|noescape}</article>
+                                <article class="article-wrapper">{$item->description|noescape|texy}</article>
                                 <hr>
                                 <h6 class="date display-6">Vytvořeno dne: </h6>
                                 <label class="badge badge-secondary ">{$item->date_created|date:'D. M. Y'}{sep}{$item->date_created|date:'h:i:s'}{/sep}</label>
@@ -49,9 +49,15 @@
                     </div>
             {/foreach}
 
-            {block footer|stripHTML|upper}
-                {include 'footer.latte'}
-            {/block}
+            {foreach $websiteElementValueHeader as $page_footer}
+                <div class="row">
+                    <div class="col">
+                        <footer class="footer bg-light p-5" id="page_footer-{$page_footer}">
+                            <p class="text-center text-muted bg-light"> {$page_footer->main_title|upper}</p>
+                        </footer>
+                    </div>
+                </div>
+            {/foreach}
         </div>
     {/block}
 {/block}

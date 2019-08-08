@@ -20,9 +20,13 @@ session:
 
 services:
 	router: App\Router\RouterFactory::createRouter
+
+	nette.latteFactory:
+	      setup:
 	- App\Presenters\ArticlePresenter(url)
 	- App\Model\ArticleManager
 	- App\Presenters\UserPresenter
 	- App\Model\UserManager
 	- App\Presenters\HomepagePresenter
 	- App\Model\HomepageManager
+

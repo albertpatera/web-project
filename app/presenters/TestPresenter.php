@@ -29,7 +29,7 @@ final class TestPresenter extends Nette\Application\UI\Presenter
     {
         $texy = new \Texy\Texy();
 
-        $valueIn =
+
 // other OPTIONAL configuration
         $texy->imageModule->root = 'images/';  // specify image folder
         $texy->allowed['phrase/ins'] = true;
@@ -55,11 +55,33 @@ final class TestPresenter extends Nette\Application\UI\Presenter
 
     public function addTexyEditor(Nette\Application\UI\Form $art, Nette\Utils\ArrayHash $values)
     {
-        echo "test";
-        self::output($values);
+        $texy = new \Texy\Texy();
 
 
+// other OPTIONAL configuration
+        $texy->imageModule->root = 'images/';  // specify image folder
+        $texy->allowed['phrase/ins'] = true;
+        $texy->allowed['phrase/del'] = true;
+        $texy->allowed['phrase/sup'] = true;
+        $texy->allowed['phrase/sub'] = true;
+        $texy->allowed['phrase/cite'] = true;
+        $texy->allowed['emoticon'] = true;
 
+
+        // processing
+        //$text = file_get_contents('syntax.texy');
+        $text = ":-) ";
+        $output = $texy->process($text);  // that's all folks!
+        echo $output;
+        dump($output);
+        // echo formated output
+        header('Content-type: text/html; charset=utf-8');
+        //echo $html;
+        // and echo generated HTML code
+        echo '<hr />';
+        echo '<pre>';
+        // echo htmlspecialchars([$values]);
+        echo '</pre>';
     }
 }
 
