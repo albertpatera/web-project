@@ -1,3 +1,9 @@
+application:
+	errorPresenter: Error
+	mapping:
+		*: App\*Module\Presenters\*Presenter
+
+
 parameters:
     database:
         driver: mysql
@@ -22,6 +28,5 @@ database:
        lazy: yes
 
 extensions:
-	texy: Lookyman\NetteTexy\DI\TexyExtension
-	    #texy: Texy
+    texy: Lookyman\NetteTexy\DI\TexyExtension
 
