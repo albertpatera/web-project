@@ -36,7 +36,6 @@ final class HomepagePresenter extends Nette\Application\UI\Presenter
     public $database;
 
 
-
     public function __construct()
     {
         parent::__construct();
@@ -54,6 +53,7 @@ final class HomepagePresenter extends Nette\Application\UI\Presenter
 
         $this->getTemplate()->websiteElementValue = $website;
     }
+
     public function renderWww()
     {
         $texy = new Texy();
@@ -145,30 +145,31 @@ final class HomepagePresenter extends Nette\Application\UI\Presenter
         $login->addText('username', 'Username:')->setRequired();
         $login->addPassword('password', 'Password');
         $login->addSubmit('submit', 'login');
-        $login->onSuccess[] = [$this, 'loginSuccessed'];
+        $login->onSuccess[] = [$this, 'editUserSuccessed'];
 
         return $login;
     }
 
-    public function loginSuccessed(Nette\Application\UI\Form $login, array $values)
+
+    public function editUserSuccessed(Nette\Application\UI\Form $formEditUser, Nette\Utils\ArrayHash $values)
     {
-        /*   try {
-                $this->userManager->getArticle();
-           } catch (\Exception $e) {
-               throw new \Exception($e->getMessage());
-           }*/
-        $usernameValue = $this->getParameter('username');
-        if($values["username"] == "admin")
-        {
-            $this->flashMessage('Login Successfully', 'success');
-        } else {
-            echo "error";
-            $this->flashMessage('login failed ! maybe user name does not exists', 'danger');
-        }
+        $user = $this->getUser();
+        $user->login('Albert Patera', '123456');
+
+        $user->isLoggedIn();
+        $user->setExpiration('30 minutes');
+        $user->getLogoutReason();
 
         try {
-            echo "value";
-        } catch (\Exception $e) {
+            $user->login("Albert Patera", "000");
+
+            $user->isLoggedIn();
+            $this->redirect(200, 'User:edit');
+
+            $user->setExpiration('30 minutes');
+            $user->getLogoutReason();
+
+        } catch (\Nette\Security\AuthenticationException $e) {
             throw new \Exception($e->getMessage());
         }
 
