@@ -1,7 +1,30 @@
+<script async defer src="https://connect.facebook.net/en_US/sdk.js"></script>
+
+<script>
+
+    FB.ui({
+        method: 'share',
+        href: 'https://developers.facebook.com/docs/'
+    }, function(response){});
+
+
+    FB.ui({
+        method: 'share_open_graph',
+        action_type: 'og.likes',
+        action_properties: JSON.stringify({
+            object:'https://developers.facebook.com/docs/javascript/examples',
+        })
+    }, function(response){
+        // Debug response (optional)
+        console.log(response);
+    });
+
+</script>
+
+
+
 <div id="fb-root"></div>
 <script async defer crossorigin="anonymous" src="https://connect.facebook.net/cs_CZ/sdk.js#xfbml=1&version=v4.0"></script>
 
-<div class="fb-login-button" data-width="350px" data-size="large" data-button-type="continue_with" data-auto-logout-link="false" data-use-continue-as="true"></div>
 
-<fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
-</fb:login-button>
+<div class="fb-login-button" data-width="350" data-size="large" data-button-type="login_with" data-auto-logout-link="false" data-use-continue-as="false"></div>
