@@ -6,6 +6,7 @@ use App\Model\AdminManager;
 use App\Model\UserManager;
 use Nette;
 use Nette\Application\UI\Presenter;
+use Tester\Environment;
 use Tracy\Debugger;
 
 
@@ -60,11 +61,11 @@ final class UserPresenter extends Presenter
     }
 
 
-    public function renderEdit($user = null)
+    public function renderEdit($id = null)
     {
 
         try {
-            $user = $this->userManager->getArticle($user);
+            $user = $this->userManager->getArticle($id);
         } catch (\Exception $e) {
             throw new \Exception('ERROR:' . $e->getMessage());
         }
@@ -124,20 +125,84 @@ final class UserPresenter extends Presenter
         return $formEditUser;
     }
 
-    public function actiionEdit()
+   /* public function actionEdit()
     {
         $postId = $this->getParameter('user');
-    }
+    }*/
+
+
 
 
 
     public function editUserSuccessed(Nette\Application\UI\Form $formEditUser, Nette\Utils\ArrayHash $values)
     {
-        echo "eeeewewqrq";
+       dumpe("eee");
+        //$postId = $this->getParameter('postId');
+        $postId = $this->getParameter('postId');
+
+        if ($postId) {
+            $post = $this->database->table('posts')->get($postId);
+            $post->update($values);
+        } else {
+            $post = $this->database->table('posts')->insert($values);
+        }
+
+        $this->flashMessage('Příspěvek byl úspěšně publikován.', 'success');
+        $this->redirect('show', $post->id);
+        $user = $this->getUser();
+        $user->login('Albert Patera', '000');;
+
+        $user->isLoggedIn();
+        $user->setExpiration('30 minutes');
+        $user->getLogoutReason();
+
+        try {
+            $user->login('admin', '123456');;
+
+            $user->isLoggedIn();
+            $user->setExpiration('30 minutes');
+            $user->getLogoutReason();
+
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
+
     }
+
+    public function renderLogout()
+    {
+        $user = $this->getUser();
+       try {
+
+           $user->login('Albert Patera', '000');;
+           $user->getLogoutReason();
+           $user->isLoggedIn();
+           $user->setExpiration('30 minutes');
+           $user->getLogoutReason();
+       } catch (\Exception $e) {
+           throw new \Exception($e->getMessage());
+       }
+    }
+
+
+        public function actionEdit($postId)
+        {
+          /*  try {
+                $post = $this->database->table('posts')->get($postId);
+            } catch (\Exception $e) {
+                throw new \Exception("this" . $e->getMessage());
+            }
+                if (!$post) {
+                $this->error('Příspěvek nebyl nalezen');
+
+          }
+            $this['postForm']->setDefaults($post->toArray());*/
+        }
+
 
     public function addingUserSuccessed(Nette\Application\UI\Form  $formAddUser, array $values)
     {
+       dumpe("eee");
         try {
             $user = $this->userManager->insertUser($values);
             $this->sessionSection = $values["username"];
