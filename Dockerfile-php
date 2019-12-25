@@ -1,0 +1,23 @@
+#FROM nginx 
+FROM lifeweb_webapp:latest 
+RUN apt-get update && apt-get install -y git
+RUN rm -rf web-project
+RUN git clone https://github.com/albertpatera/web-project.git 
+RUN cd web-project/www
+
+RUN apt-get update
+RUN apt-get install -y mariadb-server
+RUN apt-get install -y php curl unzip
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=compos
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+#RUN apt-get update && apt-get install -y libmcrypt-dev \
+  #  mysql bmagickwand-dev --no-install-recommends \
+    #&& pecl install imagick \
+    #&& docker-php-ext-enable imagick \
+#&& docker-php-ext-install mcrypt pdo_mysql
+
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=compose
+RUN docker exec -ti lifeweb_webapp_1 bash
+RUN cd web-project/www
