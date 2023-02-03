@@ -9,4 +9,5 @@ return array(
     '7745382c92b7799bf1294b1f43023ba2' => $vendorDir . '/tracy/tracy/src/shortcuts.php',
     'a12da592622097d2b593a430e32e13fd' => $vendorDir . '/nette/utils/src/loader.php',
     'e7a6fd2e7a869bb207158e9416bdd9b0' => $vendorDir . '/nette/application/src/compatibility.php',
+    '5d1dcebe069db2f62f5a447526290867' => $vendorDir . '/texy/texy/src/texy.php',
 );
