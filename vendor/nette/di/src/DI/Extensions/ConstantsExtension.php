@@ -5,6 +5,8 @@
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
+declare(strict_types=1);
+
 namespace Nette\DI\Extensions;
 
 use Nette;
@@ -12,13 +14,15 @@ use Nette;
 
 /**
  * Constant definitions.
+ * @deprecated  use Nette\Bootstrap\Extensions\ConstantsExtension
  */
-class ConstantsExtension extends Nette\DI\CompilerExtension
+final class ConstantsExtension extends Nette\DI\CompilerExtension
 {
-	public function afterCompile(Nette\PhpGenerator\ClassType $class)
+	public function loadConfiguration()
 	{
+		trigger_error(self::class . ' is deprecated, use Nette\Bootstrap\Extensions\ConstantsExtension.', E_USER_DEPRECATED);
 		foreach ($this->getConfig() as $name => $value) {
-			$class->getMethod('initialize')->addBody('define(?, ?);', [$name, $value]);
+			$this->initialization->addBody('define(?, ?);', [$name, $value]);
 		}
 	}
 }

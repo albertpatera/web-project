@@ -30,7 +30,7 @@ class ArticleManager extends DatabaseManager
 
     public function getArticles()
     {
-        return $this->database->table("new_table")->order(self::COL_ARTICLE_ID . ' DESC')->fetchAll();
+        return $this->database->table("article")->order(self::COL_ARTICLE_ID . ' DESC')->fetchAll();
     }
 
     public function getArticle($url)
@@ -63,7 +63,7 @@ class ArticleManager extends DatabaseManager
 
     public function getArticleFromCategory($url)
     {
-        return $this->database->table("new_table")->where(self::COL_ORDER, $url)->fetchAll();
+        return $this->database->table("article")->where(self::COL_ORDER, $url)->fetchAll();
     }
 
     public function getArticleForNow()
@@ -78,7 +78,7 @@ class ArticleManager extends DatabaseManager
             throw new \Exception($e->getMessage());
         }
 
-        return $this->database->table("new_table")->where(self::COL_DATE_CREATED, $dateFinal)->order(self::COL_ORDER . ' DESC')->fetchAll();
+        return $this->database->table("article")->where(self::COL_DATE_CREATED, $dateFinal)->order(self::COL_ORDER . ' DESC')->fetchAll();
 
 
     }

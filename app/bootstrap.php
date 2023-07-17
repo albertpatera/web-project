@@ -6,13 +6,23 @@ $texy->htmlOutputModule->lineWrap = 180;
 $texy->emoticonModule->root = 'images/images/';
 $texy->emoticonModule->class = 'smiley';
 $texy->allowed['emoticon'] = true;
-
-
+$filename = "DEBUG";
 $configurator = new Nette\Configurator;
 $configurator->setDebugMode(TRUE);
-//$configurator->setDebugMode('23.75.345.200'); // enable for your remote IP
-$configurator->enableTracy(__DIR__ . '/../log');
 
+// if (file_exists($filename)) {
+   // echo "The file $filename exists";
+	$configurator->setDebugMode(true);
+//} else {
+    //echo "The file $filename does not exist";
+//	$configurator->setDebugMode(false);
+//}
+
+//$configurator->setDebugMode('2a02:8308:5088:2c00:49d8:8f56:254b:3c68'); // enable for your remote IP
+$configurator->enableTracy(__DIR__ . '/../log');
+//if (file_exists(__DIR__ . '/.debug')) {
+  //  $configurator->setDebugMode(false);
+//}
 $configurator->setTimeZone('Europe/Prague');
 $configurator->setTempDirectory(__DIR__ . '/../temp');
 

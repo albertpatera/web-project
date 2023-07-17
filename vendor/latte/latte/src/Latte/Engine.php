@@ -5,7 +5,11 @@
  * Copyright (c) 2008 David Grudl (https://davidgrudl.com)
  */
 
+declare(strict_types=1);
+
 namespace Latte;
+
+use Latte\Compiler\Nodes\TemplateNode;
 
 
 /**
@@ -15,130 +19,176 @@ class Engine
 {
 	use Strict;
 
-	const VERSION = '2.4.8';
+	public const VERSION = '3.0.5';
+	public const VERSION_ID = 30005;
 
-	/** Content types */
-	const CONTENT_HTML = 'html',
-		CONTENT_XHTML = 'xhtml',
-		CONTENT_XML = 'xml',
-		CONTENT_JS = 'js',
-		CONTENT_CSS = 'css',
-		CONTENT_ICAL = 'ical',
-		CONTENT_TEXT = 'text';
+	/** @deprecated use ContentType::* */
+	public const
+		CONTENT_HTML = ContentType::Html,
+		CONTENT_XML = ContentType::Xml,
+		CONTENT_JS = ContentType::JavaScript,
+		CONTENT_CSS = ContentType::Css,
+		CONTENT_ICAL = ContentType::ICal,
+		CONTENT_TEXT = ContentType::Text;
 
-	/** @var callable[] */
-	public $onCompile = [];
+	private ?Loader $loader = null;
+	private Runtime\FilterExecutor $filters;
+	private \stdClass $functions;
+	private \stdClass $providers;
 
-	/** @var Parser */
-	private $parser;
-
-	/** @var Compiler */
-	private $compiler;
-
-	/** @var ILoader */
-	private $loader;
-
-	/** @var Runtime\FilterExecutor */
-	private $filters;
-
-	/** @var array */
-	private $providers = [];
-
-	/** @var string */
-	private $contentType = self::CONTENT_HTML;
-
-	/** @var string */
-	private $tempDirectory;
-
-	/** @var bool */
-	private $autoRefresh = true;
+	/** @var Extension[] */
+	private array $extensions = [];
+	private string $contentType = ContentType::Html;
+	private ?string $tempDirectory = null;
+	private bool $autoRefresh = true;
+	private bool $strictTypes = false;
+	private ?Policy $policy = null;
+	private bool $sandboxed = false;
 
 
 	public function __construct()
 	{
 		$this->filters = new Runtime\FilterExecutor;
+		$this->functions = new \stdClass;
+		$this->providers = new \stdClass;
+		$this->addExtension(new Essential\CoreExtension);
+		$this->addExtension(new Sandbox\SandboxExtension);
 	}
 
 
 	/**
 	 * Renders template to output.
-	 * @return void
+	 * @param  object|mixed[]  $params
 	 */
-	public function render($name, array $params = [], $block = null)
+	public function render(string $name, object|array $params = [], ?string $block = null): void
 	{
-		$this->createTemplate($name, $params + ['_renderblock' => $block])
-			->render();
+		$template = $this->createTemplate($name, $this->processParams($params));
+		$template->global->coreCaptured = false;
+		$template->render($block);
 	}
 
 
 	/**
 	 * Renders template to string.
-	 * @return string
+	 * @param  object|mixed[]  $params
 	 */
-	public function renderToString($name, array $params = [], $block = null)
+	public function renderToString(string $name, object|array $params = [], ?string $block = null): string
 	{
-		$template = $this->createTemplate($name, $params + ['_renderblock' => $block]);
-		return $template->capture([$template, 'render']);
+		$template = $this->createTemplate($name, $this->processParams($params));
+		$template->global->coreCaptured = true;
+		return $template->capture(fn() => $template->render($block));
 	}
 
 
 	/**
 	 * Creates template object.
-	 * @return Runtime\Template
+	 * @param  mixed[]  $params
 	 */
-	public function createTemplate($name, array $params = [])
+	public function createTemplate(string $name, array $params = []): Runtime\Template
 	{
 		$class = $this->getTemplateClass($name);
 		if (!class_exists($class, false)) {
 			$this->loadTemplate($name);
 		}
-		return new $class($this, $params, $this->filters, $this->providers, $name);
+
+		$this->providers->fn = $this->functions;
+		return new $class(
+			$this,
+			$params,
+			$this->filters,
+			$this->providers,
+			$name,
+		);
 	}
 
 
 	/**
 	 * Compiles template to PHP code.
-	 * @return string
 	 */
-	public function compile($name)
+	public function compile(string $name): string
 	{
-		foreach ($this->onCompile ?: [] as $cb) {
-			call_user_func(Helpers::checkCallback($cb), $this);
+		if ($this->sandboxed && !$this->policy) {
+			throw new \LogicException('In sandboxed mode you need to set a security policy.');
 		}
-		$this->onCompile = [];
 
 		$source = $this->getLoader()->getContent($name);
 
 		try {
-			$tokens = $this->getParser()->setContentType($this->contentType)
-				->parse($source);
+			$node = $this->parse($source);
+			$this->applyPasses($node);
+			$code = $this->generate($node, $name);
 
-			$code = $this->getCompiler()->setContentType($this->contentType)
-				->compile($tokens, $this->getTemplateClass($name));
-
-		} catch (\Exception $e) {
-			if (!$e instanceof CompileException) {
-				$e = new CompileException("Thrown exception '{$e->getMessage()}'", 0, $e);
+		} catch (\Throwable $e) {
+			if (!$e instanceof CompileException && !$e instanceof SecurityViolationException) {
+				$e = new CompileException("Thrown exception '{$e->getMessage()}'", previous: $e);
 			}
-			$line = isset($tokens) ? $this->getCompiler()->getLine() : $this->getParser()->getLine();
-			throw $e->setSource($source, $line, $name);
+
+			throw $e->setSource($source, $name);
 		}
 
-		if (!preg_match('#\n|\?#', $name)) {
-			$code = "<?php\n// source: $name\n?>" . $code;
-		}
-		$code = PhpHelpers::reformatCode($code);
 		return $code;
 	}
 
 
 	/**
+	 * Parses template to AST node.
+	 */
+	public function parse(string $source): TemplateNode
+	{
+		$lexer = new Compiler\TemplateLexer;
+		$parser = new Compiler\TemplateParser;
+
+		foreach ($this->extensions as $extension) {
+			$extension->beforeCompile($this);
+			$parser->addTags($extension->getTags());
+		}
+
+		return $parser
+			->setContentType($this->contentType)
+			->setPolicy($this->getPolicy(effective: true))
+			->parse($source, $lexer);
+	}
+
+
+	/**
+	 * Calls node visitors.
+	 */
+	public function applyPasses(TemplateNode &$node): void
+	{
+		$passes = [];
+		foreach ($this->extensions as $extension) {
+			$passes = array_merge($passes, $extension->getPasses());
+		}
+
+		$passes = Helpers::sortBeforeAfter($passes);
+		foreach ($passes as $pass) {
+			$pass = $pass instanceof \stdClass ? $pass->subject : $pass;
+			($pass)($node);
+		}
+	}
+
+
+	/**
+	 * Generates template PHP code.
+	 */
+	public function generate(TemplateNode $node, string $name): string
+	{
+		$comment = preg_match('#\n|\?#', $name) ? null : "source: $name";
+		$generator = new Compiler\TemplateGenerator;
+		return $generator->generate(
+			$node,
+			$this->getTemplateClass($name),
+			$comment,
+			$this->strictTypes,
+		);
+	}
+
+
+	/**
 	 * Compiles template to cache.
-	 * @param  string
-	 * @return void
 	 * @throws \LogicException
 	 */
-	public function warmupCache($name)
+	public function warmupCache(string $name): void
 	{
 		if (!$this->tempDirectory) {
 			throw new \LogicException('Path to temporary directory is not set.');
@@ -151,109 +201,157 @@ class Engine
 	}
 
 
-	/**
-	 * @return void
-	 */
-	private function loadTemplate($name)
+	private function loadTemplate(string $name): void
 	{
 		if (!$this->tempDirectory) {
 			$code = $this->compile($name);
-			if (@eval('?>' . $code) === false) { // @ is escalated to exception
+			if (@eval(substr($code, 5)) === false) { // @ is escalated to exception, substr removes <?php
 				throw (new CompileException('Error in template: ' . error_get_last()['message']))
-					->setSource($code, error_get_last()['line'], "$name (compiled)");
+					->setSource($code, "$name (compiled)");
 			}
+
 			return;
 		}
 
+		// Solving atomicity to work everywhere is really pain in the ass.
+		// 1) We want to do as little as possible IO calls on production and also directory and file can be not writable
+		// so on Linux we include the file directly without shared lock, therefore, the file must be created atomically by renaming.
+		// 2) On Windows file cannot be renamed-to while is open (ie by include), so we have to acquire a lock.
 		$file = $this->getCacheFile($name);
+		$lock = defined('PHP_WINDOWS_VERSION_BUILD')
+			? $this->acquireLock("$file.lock", LOCK_SH)
+			: null;
 
 		if (!$this->isExpired($file, $name) && (@include $file) !== false) { // @ - file may not exist
 			return;
 		}
 
-		if (!is_dir($this->tempDirectory) && !@mkdir($this->tempDirectory) && !is_dir($this->tempDirectory)) { // @ - dir may already exist
-			throw new \RuntimeException("Unable to create directory '$this->tempDirectory'. " . error_get_last()['message']);
+		if ($lock) {
+			flock($lock, LOCK_UN); // release shared lock so we can get exclusive
 		}
 
-		$handle = @fopen("$file.lock", 'c+'); // @ is escalated to exception
-		if (!$handle) {
-			throw new \RuntimeException("Unable to create file '$file.lock'. " . error_get_last()['message']);
-		} elseif (!@flock($handle, LOCK_EX)) { // @ is escalated to exception
-			throw new \RuntimeException("Unable to acquire exclusive lock on '$file.lock'. " . error_get_last()['message']);
-		}
+		$lock = $this->acquireLock("$file.lock", LOCK_EX);
 
+		// while waiting for exclusive lock, someone might have already created the cache
 		if (!is_file($file) || $this->isExpired($file, $name)) {
 			$code = $this->compile($name);
 			if (file_put_contents("$file.tmp", $code) !== strlen($code) || !rename("$file.tmp", $file)) {
 				@unlink("$file.tmp"); // @ - file may not exist
-				throw new \RuntimeException("Unable to create '$file'.");
-			} elseif (function_exists('opcache_invalidate')) {
+				throw new RuntimeException("Unable to create '$file'.");
+			}
+
+			if (function_exists('opcache_invalidate')) {
 				@opcache_invalidate($file, true); // @ can be restricted
 			}
 		}
 
 		if ((include $file) === false) {
-			throw new \RuntimeException("Unable to load '$file'.");
+			throw new RuntimeException("Unable to load '$file'.");
+		}
+	}
+
+
+	/**
+	 * @return resource
+	 */
+	private function acquireLock(string $file, int $mode)
+	{
+		$dir = dirname($file);
+		if (!is_dir($dir) && !@mkdir($dir) && !is_dir($dir)) { // @ - dir may already exist
+			throw new RuntimeException("Unable to create directory '$dir'. " . error_get_last()['message']);
 		}
 
-		flock($handle, LOCK_UN);
-		fclose($handle);
-		@unlink("$file.lock"); // @ file may become locked on Windows
+		$handle = @fopen($file, 'w'); // @ is escalated to exception
+		if (!$handle) {
+			throw new RuntimeException("Unable to create file '$file'. " . error_get_last()['message']);
+		} elseif (!@flock($handle, $mode)) { // @ is escalated to exception
+			throw new RuntimeException('Unable to acquire ' . ($mode & LOCK_EX ? 'exclusive' : 'shared') . " lock on file '$file'. " . error_get_last()['message']);
+		}
+
+		return $handle;
 	}
 
 
-	/**
-	 * @param  string
-	 * @param  string
-	 * @return bool
-	 */
-	private function isExpired($file, $name)
+	private function isExpired(string $file, string $name): bool
 	{
-		return $this->autoRefresh && $this->getLoader()->isExpired($name, (int) @filemtime($file)); // @ - file may not exist
+		if (!$this->autoRefresh) {
+			return false;
+		}
+
+		$time = @filemtime($file); // @ - file may not exist
+		if ($time === false) {
+			return true;
+		}
+
+		foreach ($this->extensions as $extension) {
+			$r = new \ReflectionObject($extension);
+			if (is_file($r->getFileName()) && filemtime($r->getFileName()) > $time) {
+				return true;
+			}
+		}
+
+		return $this->getLoader()->isExpired($name, $time);
 	}
 
 
-	/**
-	 * @return string
-	 */
-	public function getCacheFile($name)
+	public function getCacheFile(string $name): string
 	{
 		$hash = substr($this->getTemplateClass($name), 8);
-		$base = preg_match('#([/\\\\][\w@.-]{3,35}){1,3}\z#', $name, $m)
+		$base = preg_match('#([/\\\\][\w@.-]{3,35}){1,3}$#D', $name, $m)
 			? preg_replace('#[^\w@.-]+#', '-', substr($m[0], 1)) . '--'
 			: '';
 		return "$this->tempDirectory/$base$hash.php";
 	}
 
 
-	/**
-	 * @return string
-	 */
-	public function getTemplateClass($name)
+	public function getTemplateClass(string $name): string
 	{
-		$key = $this->getLoader()->getUniqueId($name) . "\00" . self::VERSION;
-		return 'Template' . substr(md5($key), 0, 10);
+		$key = [
+			$this->getLoader()->getUniqueId($name),
+			self::VERSION,
+			array_keys((array) $this->functions),
+			$this->contentType,
+		];
+		foreach ($this->extensions as $extension) {
+			$key[] = [
+				preg_replace('~\$.*~', '', $extension::class), // remove id from anonymous class
+				$extension->getCacheKey($this),
+			];
+		}
+
+		return 'Template' . substr(md5(serialize($key)), 0, 10);
 	}
 
 
 	/**
 	 * Registers run-time filter.
-	 * @param  string|null
-	 * @param  callable
-	 * @return static
 	 */
-	public function addFilter($name, $callback)
+	public function addFilter(string $name, callable $callback): static
 	{
+		if (!preg_match('#^[a-z]\w*$#iD', $name)) {
+			throw new \LogicException("Invalid filter name '$name'.");
+		}
+
 		$this->filters->add($name, $callback);
 		return $this;
 	}
 
 
 	/**
-	 * Returns all run-time filters.
-	 * @return string[]
+	 * Registers filter loader.
 	 */
-	public function getFilters()
+	public function addFilterLoader(callable $callback): static
+	{
+		$this->filters->add(null, $callback);
+		return $this;
+	}
+
+
+	/**
+	 * Returns all run-time filters.
+	 * @return callable[]
+	 */
+	public function getFilters(): array
 	{
 		return $this->filters->getAll();
 	}
@@ -261,52 +359,136 @@ class Engine
 
 	/**
 	 * Call a run-time filter.
-	 * @param  string  filter name
-	 * @param  array   arguments
-	 * @return mixed
+	 * @param  mixed[]  $args
 	 */
-	public function invokeFilter($name, array $args)
+	public function invokeFilter(string $name, array $args): mixed
 	{
-		return call_user_func_array($this->filters->$name, $args);
+		return ($this->filters->$name)(...$args);
 	}
 
 
 	/**
-	 * Adds new macro.
-	 * @return static
+	 * Adds new extension.
 	 */
-	public function addMacro($name, IMacro $macro)
+	public function addExtension(Extension $extension): static
 	{
-		$this->getCompiler()->addMacro($name, $macro);
+		$this->extensions[] = $extension;
+		foreach ($extension->getFilters() as $name => $value) {
+			$this->filters->add($name, $value);
+		}
+
+		foreach ($extension->getFunctions() as $name => $value) {
+			$this->functions->$name = $value;
+		}
+
+		foreach ($extension->getProviders() as $name => $value) {
+			$this->providers->$name = $value;
+		}
+		return $this;
+	}
+
+
+	/** @return Extension[] */
+	public function getExtensions(): array
+	{
+		return $this->extensions;
+	}
+
+
+	/**
+	 * Registers run-time function.
+	 */
+	public function addFunction(string $name, callable $callback): static
+	{
+		if (!preg_match('#^[a-z]\w*$#iD', $name)) {
+			throw new \LogicException("Invalid function name '$name'.");
+		}
+
+		$this->functions->$name = $callback;
 		return $this;
 	}
 
 
 	/**
-	 * Adds new provider.
-	 * @return static
+	 * Call a run-time function.
+	 * @param  mixed[]  $args
 	 */
-	public function addProvider($name, $value)
+	public function invokeFunction(string $name, array $args): mixed
 	{
-		$this->providers[$name] = $value;
+		if (!isset($this->functions->$name)) {
+			$hint = ($t = Helpers::getSuggestion(array_keys((array) $this->functions), $name))
+				? ", did you mean '$t'?"
+				: '.';
+			throw new \LogicException("Function '$name' is not defined$hint");
+		}
+
+		return ($this->functions->$name)(...$args);
+	}
+
+
+	/**
+	 * @return callable[]
+	 */
+	public function getFunctions(): array
+	{
+		return (array) $this->functions;
+	}
+
+
+	/**
+	 * Adds new provider.
+	 */
+	public function addProvider(string $name, mixed $value): static
+	{
+		if (!preg_match('#^[a-z]\w*$#iD', $name)) {
+			throw new \LogicException("Invalid provider name '$name'.");
+		}
+
+		$this->providers->$name = $value;
 		return $this;
 	}
 
 
 	/**
 	 * Returns all providers.
-	 * @return array
+	 * @return mixed[]
 	 */
-	public function getProviders()
+	public function getProviders(): array
 	{
-		return $this->providers;
+		return (array) $this->providers;
 	}
 
 
-	/**
-	 * @return static
-	 */
-	public function setContentType($type)
+	public function setPolicy(?Policy $policy): static
+	{
+		$this->policy = $policy;
+		return $this;
+	}
+
+
+	public function getPolicy(bool $effective = false): ?Policy
+	{
+		return !$effective || $this->sandboxed
+			? $this->policy
+			: null;
+	}
+
+
+	public function setExceptionHandler(callable $callback): static
+	{
+		$this->providers->coreExceptionHandler = $callback;
+		return $this;
+	}
+
+
+	public function setSandboxMode(bool $on = true): static
+	{
+		$this->sandboxed = $on;
+		return $this;
+	}
+
+
+	public function setContentType(string $type): static
 	{
 		$this->contentType = $type;
 		return $this;
@@ -315,9 +497,8 @@ class Engine
 
 	/**
 	 * Sets path to temporary directory.
-	 * @return static
 	 */
-	public function setTempDirectory($path)
+	public function setTempDirectory(?string $path): static
 	{
 		$this->tempDirectory = $path;
 		return $this;
@@ -326,59 +507,86 @@ class Engine
 
 	/**
 	 * Sets auto-refresh mode.
-	 * @return static
 	 */
-	public function setAutoRefresh($on = true)
+	public function setAutoRefresh(bool $on = true): static
 	{
-		$this->autoRefresh = (bool) $on;
+		$this->autoRefresh = $on;
 		return $this;
 	}
 
 
 	/**
-	 * @return Parser
+	 * Enables declare(strict_types=1) in templates.
 	 */
-	public function getParser()
+	public function setStrictTypes(bool $on = true): static
 	{
-		if (!$this->parser) {
-			$this->parser = new Parser;
-		}
-		return $this->parser;
+		$this->strictTypes = $on;
+		return $this;
 	}
 
 
-	/**
-	 * @return Compiler
-	 */
-	public function getCompiler()
-	{
-		if (!$this->compiler) {
-			$this->compiler = new Compiler;
-			Macros\CoreMacros::install($this->compiler);
-			Macros\BlockMacros::install($this->compiler);
-		}
-		return $this->compiler;
-	}
-
-
-	/**
-	 * @return static
-	 */
-	public function setLoader(ILoader $loader)
+	public function setLoader(Loader $loader): static
 	{
 		$this->loader = $loader;
 		return $this;
 	}
 
 
-	/**
-	 * @return ILoader
-	 */
-	public function getLoader()
+	public function getLoader(): Loader
 	{
 		if (!$this->loader) {
 			$this->loader = new Loaders\FileLoader;
 		}
+
 		return $this->loader;
+	}
+
+
+	/**
+	 * @param  object|mixed[]  $params
+	 * @return mixed[]
+	 */
+	private function processParams(object|array $params): array
+	{
+		if (is_array($params)) {
+			return $params;
+		} elseif (!is_object($params)) {
+			throw new \InvalidArgumentException(sprintf('Engine::render() expects array|object, %s given.', gettype($params)));
+		}
+
+		$methods = (new \ReflectionClass($params))->getMethods(\ReflectionMethod::IS_PUBLIC);
+		foreach ($methods as $method) {
+			if ($method->getAttributes(Attributes\TemplateFilter::class)) {
+				$this->addFilter($method->name, [$params, $method->name]);
+			}
+
+			if ($method->getAttributes(Attributes\TemplateFunction::class)) {
+				$this->addFunction($method->name, [$params, $method->name]);
+			}
+
+			if (strpos((string) $method->getDocComment(), '@filter')) {
+				trigger_error('Annotation @filter is deprecated, use attribute #[Latte\Attributes\TemplateFilter]', E_USER_DEPRECATED);
+				$this->addFilter($method->name, [$params, $method->name]);
+			}
+
+			if (strpos((string) $method->getDocComment(), '@function')) {
+				trigger_error('Annotation @function is deprecated, use attribute #[Latte\Attributes\TemplateFunction]', E_USER_DEPRECATED);
+				$this->addFunction($method->name, [$params, $method->name]);
+			}
+		}
+
+		return array_filter((array) $params, fn($key) => $key[0] !== "\0", ARRAY_FILTER_USE_KEY);
+	}
+
+
+	public function __get(string $name)
+	{
+		if ($name === 'onCompile') {
+			$trace = debug_backtrace(0)[0];
+			$loc = isset($trace['file'], $trace['line'])
+				? ' (in ' . $trace['file'] . ' on ' . $trace['line'] . ')'
+				: '';
+			throw new \LogicException('You use Latte 3 together with the code designed for Latte 2' . $loc);
+		}
 	}
 }

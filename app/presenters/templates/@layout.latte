@@ -3,17 +3,20 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
-
-	<title>{ifset title}{include title|stripHtml} | {/ifset}Nette Web</title>
+	<link rel="shortcut icon" href="https://upload.albertpatera.cz/me.png">
+	<title>{ifset title}{include title|stripHtml} | {/ifset}Albert Patera -eloper</title>
 </head>
 
 <body>
 	<div n:foreach="$flashes as $flash" n:class="flash, $flash->type">{$flash->message}</div>
 
-	{include content}
 
 	{block scripts}
 	<script src="https://nette.github.io/resources/js/netteForms.min.js"></script>
 	{/block}
+	
+	{include 'Homepage/menu.latte'}
+	{block content}{/block}
+	ahoj, jak se mas??? 
 </body>
 </html>

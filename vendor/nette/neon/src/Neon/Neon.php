@@ -5,40 +5,63 @@
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
+declare(strict_types=1);
+
 namespace Nette\Neon;
 
 
 /**
  * Simple parser & generator for Nette Object Notation.
+ * @see https://ne-on.org
  */
-class Neon
+final class Neon
 {
-	const BLOCK = Encoder::BLOCK;
+	public const Chain = '!!chain';
 
-	const CHAIN = '!!chain';
+	/** @deprecated use Neon::Chain */
+	public const CHAIN = self::Chain;
+
+	/** @deprecated use parameter $blockMode */
+	public const BLOCK = Encoder::BLOCK;
 
 
 	/**
-	 * Returns the NEON representation of a value.
-	 * @param  mixed  $var
-	 * @param  int  $options
-	 * @return string
+	 * Returns value converted to NEON.
 	 */
-	public static function encode($var, $options = null)
+	public static function encode(mixed $value, bool $blockMode = false, string $indentation = "\t"): string
 	{
 		$encoder = new Encoder;
-		return $encoder->encode($var, $options);
+		$encoder->blockMode = $blockMode;
+		$encoder->indentation = $indentation;
+		return $encoder->encode($value);
 	}
 
 
 	/**
-	 * Decodes a NEON string.
-	 * @param  string  $input
-	 * @return mixed
+	 * Converts given NEON to PHP value.
 	 */
-	public static function decode($input)
+	public static function decode(string $input): mixed
 	{
 		$decoder = new Decoder;
 		return $decoder->decode($input);
+	}
+
+
+	/**
+	 * Converts given NEON file to PHP value.
+	 */
+	public static function decodeFile(string $file): mixed
+	{
+		$input = @file_get_contents($file); // @ is escalated to exception
+		if ($input === false) {
+			$error = preg_replace('#^\w+\(.*?\): #', '', error_get_last()['message'] ?? '');
+			throw new Exception("Unable to read file '$file'. $error");
+		}
+
+		if (substr($input, 0, 3) === "\u{FEFF}") { // BOM
+			$input = substr($input, 3);
+		}
+
+		return self::decode($input);
 	}
 }

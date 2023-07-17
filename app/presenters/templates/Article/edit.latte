@@ -16,11 +16,9 @@
                             {if $item->title_image == NULL}
                                 <img src="http://www.avenuemagazine.com/wp-content/themes/avenue-magazine-new/images/no-image-available.png"
                                      alt="no_image" style="width: 100%; height:350px;">
-                            {else} <img class="title-image img-thumbnail" title="{$item->title_image}" alt="{$item->title_image}" src="{$item->title_image}" style="width: 100%; height:350px;">{/if}
-                            <h2 class="title display-4">
-                                {$item->username|upper}
-                            </h2>
-                            <article class="article-wrapper">{$item->description|noescape|texy}</article>
+                           		
+				 {else} <img class="title-image img-thumbnail" title="{$item->title_image}" alt="{$item->title_image}" src="{$item->title_image}" style="width: 100%; height:350px;">{/if}
+                            <article class="article-wrapper">{$item->description|noescape}</article>
                         </div>
                     </div>
 

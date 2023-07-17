@@ -5,6 +5,8 @@
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
+declare(strict_types=1);
+
 namespace Nette\Caching\Storages;
 
 use Nette;
@@ -13,40 +15,39 @@ use Nette;
 /**
  * Memory cache storage.
  */
-class MemoryStorage implements Nette\Caching\IStorage
+class MemoryStorage implements Nette\Caching\Storage
 {
 	use Nette\SmartObject;
 
-	/** @var array */
-	private $data = [];
+	private array $data = [];
 
 
-	public function read($key)
+	public function read(string $key): mixed
 	{
-		return isset($this->data[$key]) ? $this->data[$key] : null;
+		return $this->data[$key] ?? null;
 	}
 
 
-	public function lock($key)
+	public function lock(string $key): void
 	{
 	}
 
 
-	public function write($key, $data, array $dependencies)
+	public function write(string $key, $data, array $dependencies): void
 	{
 		$this->data[$key] = $data;
 	}
 
 
-	public function remove($key)
+	public function remove(string $key): void
 	{
 		unset($this->data[$key]);
 	}
 
 
-	public function clean(array $conditions)
+	public function clean(array $conditions): void
 	{
-		if (!empty($conditions[Nette\Caching\Cache::ALL])) {
+		if (!empty($conditions[Nette\Caching\Cache::All])) {
 			$this->data = [];
 		}
 	}

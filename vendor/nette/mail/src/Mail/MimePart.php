@@ -5,6 +5,8 @@
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
+declare(strict_types=1);
+
 namespace Nette\Mail;
 
 use Nette;
@@ -21,15 +23,20 @@ class MimePart
 	use Nette\SmartObject;
 
 	/** encoding */
-	const ENCODING_BASE64 = 'base64',
+	public const
+		ENCODING_BASE64 = 'base64',
 		ENCODING_7BIT = '7bit',
 		ENCODING_8BIT = '8bit',
 		ENCODING_QUOTED_PRINTABLE = 'quoted-printable';
 
 	/** @internal */
-	const EOL = "\r\n";
+	public const EOL = "\r\n";
 
-	const LINE_LENGTH = 76;
+	public const LineLength = 76;
+
+	private const
+		SequenceValue = 1, // value, RFC 2231
+		SequenceWord = 2;  // encoded-word, RFC 2047
 
 	/** @var array */
 	private $headers = [];
@@ -43,12 +50,10 @@ class MimePart
 
 	/**
 	 * Sets a header.
-	 * @param  string
-	 * @param  string|array  value or pair email => name
-	 * @param  bool
+	 * @param  string|array|null  $value  value or pair email => name
 	 * @return static
 	 */
-	public function setHeader($name, $value, $append = false)
+	public function setHeader(string $name, $value, bool $append = false)
 	{
 		if (!$name || preg_match('#[^a-z0-9-]#i', $name)) {
 			throw new Nette\InvalidArgumentException("Header name must be non-empty alphanumeric string, '$name' given.");
@@ -58,7 +63,6 @@ class MimePart
 			if (!$append) {
 				unset($this->headers[$name]);
 			}
-
 		} elseif (is_array($value)) { // email
 			$tmp = &$this->headers[$name];
 			if (!$append || !is_array($tmp)) {
@@ -73,38 +77,38 @@ class MimePart
 				} elseif (preg_match('#[\r\n]#', $recipient)) {
 					throw new Nette\InvalidArgumentException('Name must not contain line separator.');
 				}
+
 				Nette\Utils\Validators::assert($email, 'email', "header '$name'");
 				$tmp[$email] = $recipient;
 			}
-
 		} else {
 			$value = (string) $value;
 			if (!Strings::checkEncoding($value)) {
 				throw new Nette\InvalidArgumentException('Header is not valid UTF-8 string.');
 			}
+
 			$this->headers[$name] = preg_replace('#[\r\n]+#', ' ', $value);
 		}
+
 		return $this;
 	}
 
 
 	/**
 	 * Returns a header.
-	 * @param  string
 	 * @return mixed
 	 */
-	public function getHeader($name)
+	public function getHeader(string $name)
 	{
-		return isset($this->headers[$name]) ? $this->headers[$name] : null;
+		return $this->headers[$name] ?? null;
 	}
 
 
 	/**
 	 * Removes a header.
-	 * @param  string
 	 * @return static
 	 */
-	public function clearHeader($name)
+	public function clearHeader(string $name)
 	{
 		unset($this->headers[$name]);
 		return $this;
@@ -113,10 +117,8 @@ class MimePart
 
 	/**
 	 * Returns an encoded header.
-	 * @param  string
-	 * @return string|null
 	 */
-	public function getEncodedHeader($name)
+	public function getEncodedHeader(string $name): ?string
 	{
 		$offset = strlen($name) + 2; // colon + space
 
@@ -127,28 +129,29 @@ class MimePart
 			$s = '';
 			foreach ($this->headers[$name] as $email => $name) {
 				if ($name != null) { // intentionally ==
-					$s .= self::encodeHeader($name, $offset, true);
+					$s .= self::encodeSequence($name, $offset, self::SequenceWord);
 					$email = " <$email>";
 				}
+
 				$s .= self::append($email . ',', $offset);
 			}
+
 			return ltrim(substr($s, 0, -1)); // last comma
 
-		} elseif (preg_match('#^(\S+; (?:file)?name=)"(.*)"\z#', $this->headers[$name], $m)) { // Content-Disposition
+		} elseif (preg_match('#^(\S+; (?:file)?name=)"(.*)"$#D', $this->headers[$name], $m)) { // Content-Disposition
 			$offset += strlen($m[1]);
-			return $m[1] . '"' . self::encodeHeader($m[2], $offset) . '"';
+			return $m[1] . self::encodeSequence(stripslashes($m[2]), $offset, self::SequenceValue);
 
 		} else {
-			return ltrim(self::encodeHeader($this->headers[$name], $offset));
+			return ltrim(self::encodeSequence($this->headers[$name], $offset));
 		}
 	}
 
 
 	/**
 	 * Returns all headers.
-	 * @return array
 	 */
-	public function getHeaders()
+	public function getHeaders(): array
 	{
 		return $this->headers;
 	}
@@ -156,11 +159,9 @@ class MimePart
 
 	/**
 	 * Sets Content-Type header.
-	 * @param  string
-	 * @param  string
 	 * @return static
 	 */
-	public function setContentType($contentType, $charset = null)
+	public function setContentType(string $contentType, ?string $charset = null)
 	{
 		$this->setHeader('Content-Type', $contentType . ($charset ? "; charset=$charset" : ''));
 		return $this;
@@ -169,10 +170,9 @@ class MimePart
 
 	/**
 	 * Sets Content-Transfer-Encoding header.
-	 * @param  string
 	 * @return static
 	 */
-	public function setEncoding($encoding)
+	public function setEncoding(string $encoding)
 	{
 		$this->setHeader('Content-Transfer-Encoding', $encoding);
 		return $this;
@@ -181,9 +181,8 @@ class MimePart
 
 	/**
 	 * Returns Content-Transfer-Encoding header.
-	 * @return string
 	 */
-	public function getEncoding()
+	public function getEncoding(): string
 	{
 		return $this->getHeader('Content-Transfer-Encoding');
 	}
@@ -191,31 +190,28 @@ class MimePart
 
 	/**
 	 * Adds or creates new multipart.
-	 * @return self
 	 */
-	public function addPart(self $part = null)
+	public function addPart(?self $part = null): self
 	{
-		return $this->parts[] = $part === null ? new self : $part;
+		return $this->parts[] = $part ?? new self;
 	}
 
 
 	/**
 	 * Sets textual body.
-	 * @param  string
 	 * @return static
 	 */
-	public function setBody($body)
+	public function setBody(string $body)
 	{
-		$this->body = (string) $body;
+		$this->body = $body;
 		return $this;
 	}
 
 
 	/**
 	 * Gets textual body.
-	 * @return string
 	 */
-	public function getBody()
+	public function getBody(): string
 	{
 		return $this->body;
 	}
@@ -226,9 +222,8 @@ class MimePart
 
 	/**
 	 * Returns encoded message.
-	 * @return string
 	 */
-	public function getEncodedMessage()
+	public function getEncodedMessage(): string
 	{
 		$output = '';
 		$boundary = '--------' . Nette\Utils\Random::generate();
@@ -238,8 +233,10 @@ class MimePart
 			if ($this->parts && $name === 'Content-Type') {
 				$output .= ';' . self::EOL . "\tboundary=\"$boundary\"";
 			}
+
 			$output .= self::EOL;
 		}
+
 		$output .= self::EOL;
 
 		$body = $this->body;
@@ -250,7 +247,7 @@ class MimePart
 					break;
 
 				case self::ENCODING_BASE64:
-					$output .= rtrim(chunk_split(base64_encode($body), self::LINE_LENGTH, self::EOL));
+					$output .= rtrim(chunk_split(base64_encode($body), self::LineLength, self::EOL));
 					break;
 
 				case self::ENCODING_7BIT:
@@ -272,9 +269,11 @@ class MimePart
 			if (substr($output, -strlen(self::EOL)) !== self::EOL) {
 				$output .= self::EOL;
 			}
+
 			foreach ($this->parts as $part) {
 				$output .= '--' . $boundary . self::EOL . $part->getEncodedMessage() . self::EOL;
 			}
+
 			$output .= '--' . $boundary . '--';
 		}
 
@@ -287,17 +286,17 @@ class MimePart
 
 	/**
 	 * Converts a 8 bit header to a string.
-	 * @param  string
-	 * @param  int
-	 * @param  bool
-	 * @return string
 	 */
-	private static function encodeHeader($s, &$offset = 0, $quotes = false)
+	private static function encodeSequence(string $s, int &$offset = 0, ?int $type = null): string
 	{
-		if (strspn($s, "!\"#$%&\'()*+,-./0123456789:;<>@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^`abcdefghijklmnopqrstuvwxyz{|}~=? _\r\n\t") === strlen($s)) {
-			if ($quotes && preg_match('#[^ a-zA-Z0-9!\#$%&\'*+/?^_`{|}~-]#', $s)) { // RFC 2822 atext except =
+		if (
+			(strlen($s) < self::LineLength - 3) && // 3 is tab + quotes
+			strspn($s, "!\"#$%&\\'()*+,-./0123456789:;<>@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^`abcdefghijklmnopqrstuvwxyz{|}~=? _\r\n\t") === strlen($s)
+		) {
+			if ($type && preg_match('#[^ a-zA-Z0-9!\#$%&\'*+/?^_`{|}~-]#', $s)) { // RFC 2822 atext except =
 				return self::append('"' . addcslashes($s, '"\\') . '"', $offset);
 			}
+
 			return self::append($s, $offset);
 		}
 
@@ -314,17 +313,23 @@ class MimePart
 		]);
 
 		$offset = strlen($s) - strrpos($s, "\n");
-		$s = str_replace("\n ", "\n\t", substr($s, $old + 2)); // adds ': '
+		$s = substr($s, $old + 2); // adds ': '
+		if ($type === self::SequenceValue) {
+			$s = '"' . $s . '"';
+		}
+
+		$s = str_replace("\n ", "\n\t", $s);
 		return $o . $s;
 	}
 
 
-	private static function append($s, &$offset = 0)
+	private static function append(string $s, int &$offset = 0): string
 	{
-		if ($offset + strlen($s) > self::LINE_LENGTH) {
+		if ($offset + strlen($s) > self::LineLength) {
 			$offset = 1;
 			$s = self::EOL . "\t" . $s;
 		}
+
 		$offset += strlen($s);
 		return $s;
 	}
