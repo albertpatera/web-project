@@ -32,10 +32,6 @@ class ArticleManager extends DatabaseManager
     {
         return $this->database->table("article")->order(self::COL_ARTICLE_ID . ' DESC')->fetchAll();
     }
-    public function getArticlesEdit()
-    {
-        return $this->database->table("article")->order(self::COL_ARTICLE_ID . ' DESC')->fetch();
-    }
 
     public function getArticle($url)
     {
@@ -46,9 +42,8 @@ class ArticleManager extends DatabaseManager
      //   return;
 	try {
 
-            $this->database->table("article")->insert( [$username]);
-            //$this->database->table("new_table")->insert( [$username]);
-            echo "<h3>super</h3>";
+            $this->database->table("new_table")->insert( [$username]);
+         x   echo "<h3>super</h3>";
             /*dumpe($username);*/
 
         } catch (\Exception $e) {
