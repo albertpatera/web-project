@@ -64,7 +64,7 @@ final class ArticlePresenter extends Presenter
        $form->addText('description', 'description:')->setRequired();
        $form->addSubmit('sbmt', 'Odeslat');
         $form->onSuccess[] = [$this, 'addingArticleSuccessed'];
-
+           
         return $form;
     }
 
