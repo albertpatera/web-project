@@ -3,7 +3,7 @@
 use Latte\Runtime as LR;
 
 /** source: /var/www/blog.albertpatera.cz/app/presenters/templates/Homepage/header.latte */
-final class Template897c2bb2ac extends Latte\Runtime\Template
+final class Templatea94e183e45 extends Latte\Runtime\Template
 {
 
 	public function main(array $ʟ_args): void
@@ -15,7 +15,7 @@ final class Template897c2bb2ac extends Latte\Runtime\Template
 			return;
 		}
 
-		echo '<link rel="shortcut icon" href="https://upload.albertpatera.cz/me.png">
+		echo '+<link rel="shortcut icon" href="https://upload.albertpatera.cz/me.png">
 
 <style>
     /* Container holding the image and the text */

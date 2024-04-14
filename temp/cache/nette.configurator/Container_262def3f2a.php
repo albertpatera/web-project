@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-class Container_7fc09b78f9 extends Nette\DI\Container
+class Container_262def3f2a extends Nette\DI\Container
 {
 	protected $tags = [
 		'nette.inject' => [
@@ -136,8 +136,8 @@ class Container_7fc09b78f9 extends Nette\DI\Container
 			'appDir' => '/var/www/blog.albertpatera.cz/app',
 			'wwwDir' => '/var/www/blog.albertpatera.cz/www',
 			'vendorDir' => '/var/www/blog.albertpatera.cz/vendor',
-			'debugMode' => true,
-			'productionMode' => false,
+			'debugMode' => false,
+			'productionMode' => true,
 			'consoleMode' => false,
 			'tempDir' => '/var/www/blog.albertpatera.cz/app/../temp',
 		];
@@ -160,7 +160,7 @@ class Container_7fc09b78f9 extends Nette\DI\Container
 		$service->url = $this->getService('02');
 		$service->articleValueNow = $this->getService('02');
 		$service->articleValue = $this->getService('02');
-		$service->invalidLinkMode = 5;
+		$service->invalidLinkMode = 1;
 		return $service;
 	}
 
@@ -186,7 +186,7 @@ class Container_7fc09b78f9 extends Nette\DI\Container
 		);
 		$service->userValue = $this->getService('04');
 		$service->userManager = $this->getService('04');
-		$service->invalidLinkMode = 5;
+		$service->invalidLinkMode = 1;
 		return $service;
 	}
 
@@ -214,7 +214,7 @@ class Container_7fc09b78f9 extends Nette\DI\Container
 		$service->websiteElementValueFooter = $this->getService('06');
 		$service->userValue = $this->getService('04');
 		$service->articleValue = $this->getService('02');
-		$service->invalidLinkMode = 5;
+		$service->invalidLinkMode = 1;
 		return $service;
 	}
 
@@ -240,7 +240,7 @@ class Container_7fc09b78f9 extends Nette\DI\Container
 		);
 		$service->userValue = $this->getService('04');
 		$service->userManager = $this->getService('04');
-		$service->invalidLinkMode = 5;
+		$service->invalidLinkMode = 1;
 		return $service;
 	}
 
@@ -264,7 +264,7 @@ class Container_7fc09b78f9 extends Nette\DI\Container
 			$this->getService('security.user'),
 			$this->getService('latte.templateFactory'),
 		);
-		$service->invalidLinkMode = 5;
+		$service->invalidLinkMode = 1;
 		return $service;
 	}
 
@@ -282,7 +282,7 @@ class Container_7fc09b78f9 extends Nette\DI\Container
 			$this->getService('security.user'),
 			$this->getService('latte.templateFactory'),
 		);
-		$service->invalidLinkMode = 5;
+		$service->invalidLinkMode = 1;
 		return $service;
 	}
 
@@ -307,17 +307,12 @@ class Container_7fc09b78f9 extends Nette\DI\Container
 			$this->getService('http.request'),
 			$this->getService('http.response'),
 		);
-		$service->catchExceptions = null;
+		$service->catchExceptions = true;
 		$service->errorPresenter = 'Error';
 		Nette\Bridges\ApplicationDI\ApplicationExtension::initializeBlueScreenPanel(
 			$this->getService('tracy.blueScreen'),
 			$service,
 		);
-		$this->getService('tracy.bar')->addPanel(new Nette\Bridges\ApplicationTracy\RoutingPanel(
-			$this->getService('router'),
-			$this->getService('http.request'),
-			$this->getService('application.presenterFactory'),
-		));
 		return $service;
 	}
 
@@ -334,11 +329,7 @@ class Container_7fc09b78f9 extends Nette\DI\Container
 
 	public function createServiceApplication__presenterFactory(): Nette\Application\IPresenterFactory
 	{
-		$service = new Nette\Application\PresenterFactory(new Nette\Bridges\ApplicationDI\PresenterFactoryCallback(
-			$this,
-			5,
-			'/var/www/blog.albertpatera.cz/app/../temp/cache/nette.application/touch',
-		));
+		$service = new Nette\Application\PresenterFactory(new Nette\Bridges\ApplicationDI\PresenterFactoryCallback($this, 1, null));
 		$service->setMapping(['*' => 'App\*Module\Presenters\*Presenter']);
 		return $service;
 	}
@@ -359,7 +350,7 @@ class Container_7fc09b78f9 extends Nette\DI\Container
 	}
 
 
-	public function createServiceContainer(): Container_7fc09b78f9
+	public function createServiceContainer(): Container_262def3f2a
 	{
 		return $this;
 	}
@@ -370,7 +361,7 @@ class Container_7fc09b78f9 extends Nette\DI\Container
 		$service = new Nette\Database\Connection('mysql:host=localhost;dbname=blog', 'newuser', 'pltkrcni', ['lazy' => true]);
 		Nette\Bridges\DatabaseTracy\ConnectionPanel::initialize(
 			$service,
-			true,
+			false,
 			'default',
 			true,
 			$this->getService('tracy.bar'),
@@ -431,7 +422,7 @@ class Container_7fc09b78f9 extends Nette\DI\Container
 			private $container;
 
 
-			public function __construct(Container_7fc09b78f9 $container)
+			public function __construct(Container_262def3f2a $container)
 			{
 				$this->container = $container;
 			}
@@ -441,7 +432,7 @@ class Container_7fc09b78f9 extends Nette\DI\Container
 			{
 				$service = new Latte\Engine;
 				$service->setTempDirectory('/var/www/blog.albertpatera.cz/app/../temp/cache/latte');
-				$service->setAutoRefresh(true);
+				$service->setAutoRefresh(false);
 				$service->setStrictTypes(false);
 				return $service;
 			}
@@ -451,15 +442,13 @@ class Container_7fc09b78f9 extends Nette\DI\Container
 
 	public function createServiceLatte__templateFactory(): Nette\Bridges\ApplicationLatte\TemplateFactory
 	{
-		$service = new Nette\Bridges\ApplicationLatte\TemplateFactory(
+		return new Nette\Bridges\ApplicationLatte\TemplateFactory(
 			$this->getService('latte.latteFactory'),
 			$this->getService('http.request'),
 			$this->getService('security.user'),
 			$this->getService('cache.storage'),
 			null,
 		);
-		Nette\Bridges\ApplicationDI\LatteExtension::initLattePanel($service, $this->getService('tracy.bar'), false);
-		return $service;
 	}
 
 
@@ -489,13 +478,11 @@ class Container_7fc09b78f9 extends Nette\DI\Container
 
 	public function createServiceSecurity__user(): Nette\Security\User
 	{
-		$service = new Nette\Security\User(
+		return new Nette\Security\User(
 			$this->getService('security.legacyUserStorage'),
 			$this->getService('04'),
 			storage: $this->getService('security.userStorage'),
 		);
-		$this->getService('tracy.bar')->addPanel(new Nette\Bridges\SecurityTracy\UserPanel($service));
-		return $service;
 	}
 
 
@@ -534,10 +521,6 @@ class Container_7fc09b78f9 extends Nette\DI\Container
 
 	public function initialize()
 	{
-		// di.
-		(function () {
-			$this->getService('tracy.bar')->addPanel(new Nette\Bridges\DITracy\ContainerPanel($this));
-		})();
 		// http.
 		(function () {
 			$response = $this->getService('http.response');

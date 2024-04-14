@@ -3,7 +3,7 @@
 use Latte\Runtime as LR;
 
 /** source: /var/www/blog.albertpatera.cz/app/presenters/templates/Homepage/www.latte */
-final class Templatebe774e1ae0 extends Latte\Runtime\Template
+final class Template3affd26747 extends Latte\Runtime\Template
 {
 	public const Blocks = [
 		['content' => 'blockContent', 'head' => 'blockHead', 'body' => 'blockBody', 'header' => 'blockHeader'],
@@ -29,7 +29,7 @@ final class Templatebe774e1ae0 extends Latte\Runtime\Template
 		extract($this->params);
 
 		if (!$this->getReferringTemplate() || $this->getReferenceType() === 'extends') {
-			foreach (array_intersect_key(['item' => '16', 'userOutput' => '52', 'page_footer' => '70'], $this->params) as $ʟ_v => $ʟ_l) {
+			foreach (array_intersect_key(['item' => '16', 'userOutput' => '52'], $this->params) as $ʟ_v => $ʟ_l) {
 				trigger_error("Variable \$$ʟ_v overwritten in foreach on line $ʟ_l");
 			}
 		}
@@ -96,7 +96,7 @@ final class Templatebe774e1ae0 extends Latte\Runtime\Template
 			echo '
                                 <h3 class="card-title  text-center text-block">
                                 ';
-			echo $item->url /* line 28 */;
+			echo $item->username /* line 28 */;
 			echo '
 				</h3>
 				</div>
@@ -108,17 +108,16 @@ final class Templatebe774e1ae0 extends Latte\Runtime\Template
                                 <h6 class="date">Vytvořeno dne: </h6>
                                 <table class="table">
 					<tr>
-						sekce <td>SEKCE:<label class="text-center badge badge-secondary text-white"><a href="';
+						sekce <td>:<label class="text-center badge badge-primary text-white"><a href="';
 			echo LR\Filters::escapeHtmlAttr($this->global->uiControl->link('Article:edit', [$item->url]));
-			echo '"><small>';
+			echo '" class="menu-link text-white "><small>';
 			echo LR\Filters::escapeHtmlText(($this->filters->upper)($item->url)) /* line 37 */;
 			echo '</a></small></label>
 							</td>
 						<td>Vytvořeno dne:
-                                <label class="badge badge-secondary ">';
-			echo LR\Filters::escapeHtmlText(($this->filters->date)($item->date_created, 'D. M. Y')) /* line 40 */;
+                                <label class="badge badge-primary text-white">';
+			echo LR\Filters::escapeHtmlText(($this->filters->date)($item->date_created, 'd .m. Y')) /* line 40 */;
 			if (!$iterator->isLast()) /* line 40 */ {
-				echo LR\Filters::escapeHtmlText(($this->filters->date)($item->date_created, 'h:i:s')) /* line 40 */;
 			}
 			echo '</label>
 
@@ -167,24 +166,9 @@ final class Templatebe774e1ae0 extends Latte\Runtime\Template
 		}
 		$iterator = $ʟ_it = $ʟ_it->getParent();
 
-		echo "\n";
-		foreach ($websiteElementValueHeader as $page_footer) /* line 70 */ {
-			echo '                <div class="row">
-                    <div class="col">
-                        <footer class="footer bg-dark p-1 ml-5 mr-2" id="page_footer-';
-			echo LR\Filters::escapeHtmlAttr($page_footer->id) /* line 73 */;
-			echo '">
-                            
-				<p class="text-center text-light bg-dark card-footer"> ';
-			echo LR\Filters::escapeHtmlText(($this->filters->upper)($page_footer->main_title)) /* line 75 */;
-			echo '</p>
-                        </footer>
-                    </div>
-                </div>
+		echo '	
 ';
-
-		}
-
+		$this->createTemplate('footer.latte', $this->params, 'include')->renderToContentType('html') /* line 70 */;
 		echo '        </div>
 ';
 	}

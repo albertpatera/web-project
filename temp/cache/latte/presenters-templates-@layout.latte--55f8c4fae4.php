@@ -3,7 +3,7 @@
 use Latte\Runtime as LR;
 
 /** source: /var/www/blog.albertpatera.cz/app/presenters/templates/@layout.latte */
-final class Template729b1da8ef extends Latte\Runtime\Template
+final class Template55f8c4fae4 extends Latte\Runtime\Template
 {
 	public const Blocks = [
 		['scripts' => 'blockScripts', 'content' => 'blockContent'],

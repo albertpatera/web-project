@@ -3,7 +3,7 @@
 use Latte\Runtime as LR;
 
 /** source: /var/www/blog.albertpatera.cz/app/presenters/templates/Homepage/menu.latte */
-final class Templatec673bc14b6 extends Latte\Runtime\Template
+final class Templatee8bb0cf19e extends Latte\Runtime\Template
 {
 
 	public function main(array $ʟ_args): void
@@ -15,7 +15,7 @@ final class Templatec673bc14b6 extends Latte\Runtime\Template
 			return;
 		}
 
-		echo '<div style="z-index: 1">
+		echo '<div style="">
 <nav class="navbar navbar-expand-lg navbar-light bg-light z-index-1" style="lků§k§ůklkjlůklů">
     <a class="navbar-brand" href="#">Albert Patera</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,7 +32,7 @@ final class Templatec673bc14b6 extends Latte\Runtime\Template
             </li>
             <li class="nav-item">
                 <a href="';
-		echo LR\Filters::escapeHtmlAttr($this->global->uiControl->link('User:edit', ['blog']));
+		echo LR\Filters::escapeHtmlAttr($this->global->uiControl->link('Article:edit', ['blog']));
 		echo '" class="nav-link">Blog</a>
             </li>
             <li class="nav-item dropdown">

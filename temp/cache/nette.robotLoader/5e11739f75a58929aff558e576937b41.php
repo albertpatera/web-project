@@ -20,7 +20,7 @@ return array (
     'App\\Model\\HomepageManager' => 
     array (
       0 => '/var/www/blog.albertpatera.cz/app/model/HomepageManager.php',
-      1 => 1629489562,
+      1 => 1712509781,
     ),
     'App\\Model\\DatabaseManager' => 
     array (
@@ -35,12 +35,17 @@ return array (
     'App\\Presenters\\UserPresenter' => 
     array (
       0 => '/var/www/blog.albertpatera.cz/app/presenters/UserPresenter.php',
-      1 => 1712504581,
+      1 => 1712507389,
+    ),
+    'App\\Presenters\\ArticlePresenter' => 
+    array (
+      0 => '/var/www/blog.albertpatera.cz/app/presenters/ArticlePresenter.php',
+      1 => 1712507318,
     ),
     'App\\Presenters\\HomepagePresenter' => 
     array (
       0 => '/var/www/blog.albertpatera.cz/app/presenters/HomepagePresenter.php',
-      1 => 1712505976,
+      1 => 1712509389,
     ),
     'App\\Presenters\\AdminPresenter' => 
     array (
@@ -62,27 +67,13 @@ return array (
       0 => '/var/www/blog.albertpatera.cz/app/presenters/TestPresenter.php',
       1 => 1712505976,
     ),
-    'App\\Presenters\\ArticlePresenter' => 
-    array (
-      0 => '/var/www/blog.albertpatera.cz/app/presenters/ArticlePresenter.php',
-      1 => 1712506445,
-    ),
   ),
   1 => 
   array (
-    'null' => 3,
-    'App\\Presenters\\HomepageWwwTemplate' => 3,
-    'App\\Presenters\\HomepageTemplate' => 3,
-    'App\\Presenters\\UserEditTemplate' => 2,
-    'App\\Presenters\\UserTemplate' => 3,
-    'App\\Presenters\\ArticleEditTemplate' => 3,
-    'App\\Presenters\\ArticleTemplate' => 3,
-    'App\\Presenters\\UserAddTemplate' => 3,
-    'App\\Presenters\\ArticleDefaultTemplate' => 3,
   ),
   2 => 
   array (
-    '/var/www/blog.albertpatera.cz/app/bootstrap.php' => 1712505976,
+    '/var/www/blog.albertpatera.cz/app/bootstrap.php' => 1712509268,
     '/var/www/blog.albertpatera.cz/app/model/AdminPresenter.php' => 1629489562,
   ),
 );
