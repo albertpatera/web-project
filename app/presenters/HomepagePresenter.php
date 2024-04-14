@@ -97,15 +97,17 @@ final class HomepagePresenter extends Nette\Application\UI\Presenter
 
         //render for header and footer tag elements
 
-        $website = $this->websiteElementValueHeader->getWebsiteElement();
+        $websiteHeader = $this->websiteElementValueHeader->getElementHeader();
+        $websiteFooter = $this->websiteElementValueFooter->getElementFooter();
 
         try {
-            $this->websiteElementValueHeader->getWebsiteElement();
+           // $this->websiteElementValueHeader->getWebsiteElement();
         } catch (\Exception $e) {
-            throw new \Exception("fff" . $e->getMessage());
+          //  throw new \Exception("fff" . $e->getMessage());
         }
 
-        $this->getTemplate()->websiteElementValueHeader = $website;
+        $this->getTemplate()->websiteElementValueHeader = $websiteHeader;
+        $this->getTemplate()->websiteElementValueFooter = $websiteFooter;
     }
 
     protected function createComponentAddElement()
