@@ -6,13 +6,13 @@ $texy->htmlOutputModule->lineWrap = 180;
 $texy->emoticonModule->root = 'images/images/';
 $texy->emoticonModule->class = 'smiley';
 $texy->allowed['emoticon'] = true;
-
-
+$filename = "DEBUG";
 $configurator = new Nette\Configurator;
-$configurator->setDebugMode(TRUE);
-//$configurator->setDebugMode('23.75.345.200'); // enable for your remote IP
+$configurator->setDebugMode(false);
 $configurator->enableTracy(__DIR__ . '/../log');
-
+//if (file_exists(__DIR__ . '/.debug')) {
+  //  $configurator->setDebugMode(false);
+//}
 $configurator->setTimeZone('Europe/Prague');
 $configurator->setTempDirectory(__DIR__ . '/../temp');
 

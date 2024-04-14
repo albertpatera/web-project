@@ -5,6 +5,8 @@
  * Copyright (c) 2008 David Grudl (https://davidgrudl.com)
  */
 
+declare(strict_types=1);
+
 namespace Latte\Runtime;
 
 use Latte;
@@ -13,12 +15,11 @@ use Latte;
 /**
  * HTML literal.
  */
-class Html implements IHtmlString
+class Html implements HtmlStringable
 {
 	use Latte\Strict;
 
-	/** @var string */
-	private $value;
+	private string $value;
 
 
 	public function __construct($value)
@@ -27,10 +28,7 @@ class Html implements IHtmlString
 	}
 
 
-	/**
-	 * @return string
-	 */
-	public function __toString()
+	public function __toString(): string
 	{
 		return $this->value;
 	}

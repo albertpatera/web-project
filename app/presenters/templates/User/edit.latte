@@ -25,13 +25,13 @@
     <a n:href="User:logout">Logout {$userOutput->username}</a>
 
     <div class="card d-inline-block" style="width:20rem;margin:20px 0 24px 0">
-        <img class="card-img-top" src="{$userOutput->prof_image}">
+        <img class="card-img-top" src="https://upload.albertpatera.cz/logo.png">
         <div class="card-body">
 
             <h4 class="card-title">{$userOutput->username|upper}</h4>
             <label class="badge badge-secondary">{$userOutput->role}</label>
             <p class="card-text"><a href="#">{$userOutput->url}</a></p>
-            <p class="card-text text-justify text-muted"><i>{$userOutput->sign|noescape}</i></p>
+            <p class="card-text text-justify text-muted"><i>{$userOutput->sign} </i></p>
             <a href="javascript:void(0)" class="btn btn-primary">See Profile</a>
 
         </div>

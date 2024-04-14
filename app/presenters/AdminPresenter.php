@@ -141,7 +141,7 @@ final class AdminPresenter extends Presenter
             $this->sessionSection = $values["username"];
 
         } catch (\Exception $e) {
-            throw new \Exception($e->getMessage());
+       //     throw new \Exception($e->getMessage());
         }
         if($user) {
             dump($values);

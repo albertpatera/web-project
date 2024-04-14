@@ -30,7 +30,11 @@ class ArticleManager extends DatabaseManager
 
     public function getArticles()
     {
-        return $this->database->table("new_table")->order(self::COL_ARTICLE_ID . ' DESC')->fetchAll();
+        return $this->database->table("article")->order(self::COL_ARTICLE_ID . ' DESC')->fetchAll();
+    }
+    public function getArticlesEdit()
+    {
+        return $this->database->table("article")->order(self::COL_ARTICLE_ID . ' DESC')->fetch();
     }
 
     public function getArticle($url)
@@ -39,16 +43,19 @@ class ArticleManager extends DatabaseManager
     }
 
     public function register($username) {
-        try {
+     //   return;
+	try {
 
-            $this->database->table("new_table")->insert( [$username]);
+            $this->database->table("article")->insert( [$username]);
+            //$this->database->table("new_table")->insert( [$username]);
             echo "<h3>super</h3>";
             /*dumpe($username);*/
 
         } catch (\Exception $e) {
-            echo "error thile inserting";
-            dumpe($username);
-            throw new \Exception($e->getMessage());
+          //  echo "error thile inserting";
+          
+            //echo $e->getMessage();
+		//dumpe($e->getMessage());
         }
 
     }
@@ -63,7 +70,7 @@ class ArticleManager extends DatabaseManager
 
     public function getArticleFromCategory($url)
     {
-        return $this->database->table("new_table")->where(self::COL_ORDER, $url)->fetchAll();
+        return $this->database->table("article")->where(self::COL_ORDER, $url)->fetchAll();
     }
 
     public function getArticleForNow()
@@ -78,7 +85,7 @@ class ArticleManager extends DatabaseManager
             throw new \Exception($e->getMessage());
         }
 
-        return $this->database->table("new_table")->where(self::COL_DATE_CREATED, $dateFinal)->order(self::COL_ORDER . ' DESC')->fetchAll();
+        return $this->database->table("article")->where(self::COL_DATE_CREATED, $dateFinal)->order(self::COL_ORDER . ' DESC')->fetchAll();
 
 
     }

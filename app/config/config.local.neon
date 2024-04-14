@@ -10,7 +10,7 @@ parameters:
         host: localhost
         port: 3306
         dbname: test
-        user: newuser->
+        user: newuser
         password: password
         #dbname: articles
 
@@ -21,12 +21,12 @@ parameters:
 
 # Konfigurace databázového připojení v rámci celé aplikace.
 database:
-    dsn: 'mysql:host=localhost;dbname=web' # Typ, adresa a název databáze
+    dsn: 'mysql:host=localhost;dbname=blog' # Typ, adresa a název databáze
     user: newuser  # Uživatelské jméno
-    password: password # Heslo
+    password: pltkrcni # Heslo
     options:
        lazy: yes
 
-extensions:
-    texy: Lookyman\NetteTexy\DI\TexyExtension
+#extensions:
+ #   texy: Lookyman\NetteTexy\DI\TexyExtension
 

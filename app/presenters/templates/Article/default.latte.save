@@ -1,0 +1,94 @@
+{*https://www.itnetwork.cz/php/nette/zaklady/jednoduchy-redakcni-system-v-nette-vypis-clanku*}
+{block content}
+   {block head}
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+   {/block}
+   <h1 n:block="title" class="test-center alert alert-success">Adding articles</h1>
+   <h2><a n:href="User:add">User manager</a></h2>
+<div class="col-md-8">
+<form n:name=postForm n:class=form-group form-lg>
+		
+		<p><label n:name=username>Titulek: <input n:class=form-control input-lg  n:name=username size=20  autofocus></label><p>
+		<p><label n:name=description>Obsah: <textarea n:class=form-control input-lg n:name=description size=20 autofocus rows=10></textarea></label></p>
+		<p><label>Sekce: <input n:class=form-control n:name=url></label></p>
+				<p><label{control postForm}
+ n:name=username>Titulek: <input type=submit n:class=form-control input-lg btn btn-primary  n:name=description size=20  autofocus></label></p>
+				<p><label n:name=date_created>datum: <input type=date n:class=form-control input-lg btn btn-primary  n:name=date_created size=20  autofocus></label></p>
+			
+</form>
+</div>
+
+</div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-10">
+            <table class="table">
+
+          <tr>
+             <th>#</th>
+             <th>Main Title</th>
+             <th>description</th>
+             <th>profile</th>
+             <th>action</th>
+          </tr>
+
+        <h3>All Articles</h3>
+          {foreach $articleValue as $article}
+
+          <tr>
+             <td>{$article->id}</td>
+             <td>{$article->username}</td>
+             <td>{$article->description}</td>
+             <td>
+                <a n:href="Article:default">link</a>
+             </td>
+             <td>
+               | <a n:href="Article:edit">Edit</a>
+               | <a n:href="Article:remove">X</a>
+               | <a n:href="Article:visible">visible</a> |
+             </td>
+          </tr>
+
+    {/foreach}
+            </table>
+    <hr>
+<div class="row">
+    <div class="col-md-10">
+        <h3>All  posts per 1 day</h3>
+        <table class="table">
+
+            <tr>
+                <th>#</th>
+                <th>Main Title</th>
+                <th>description</th>
+                <th>profile</th>
+                <th>date</th>
+                <th>action</th>
+            </tr>
+        {foreach $articleValueNow as $articleDayly}
+        <tr>
+            <td>{$articleDayly->id}</td>
+            <td>{$articleDayly->username}</td>
+            <td>{$articleDayly->description|noescape}</td>
+            <td>
+                <a n:href="Article:default">link</a>
+            </td>
+            <td>{$articleDayly->date_created}</td>
+            <td>
+                | <a n:href="Article:edit">Edit</a>
+                | <a n:href="Article:remove">X</a>
+                | <a n:href="Article:visible">visible</a> |
+            </td>
+        </tr>
+
+    {/foreach}
+    </table>
+
+    </div>
+    </div>
+</div>
+
+{/block}
+

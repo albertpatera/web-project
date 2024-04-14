@@ -8,7 +8,7 @@ application:
 
 # Konfigurace databázového připojení v rámci celé aplikace.
 database:
-    dsn: 'mysql:host=localhost;dbname=web' # Typ, adresa a název databáze
+    dsn: 'mysql:host=localhost;dbname=blog' # Typ, adresa a název databáze
     user:  newuser
     password: pltkrcni
     options:

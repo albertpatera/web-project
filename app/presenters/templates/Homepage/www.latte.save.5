@@ -1,0 +1,88 @@
+
+{block content}
+    {block head}
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+	 <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+<link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">   
+1 {/block}
+
+    {block body}
+	{block header} {include 'header.latte'}{/block}
+	        <div class="bg-light">
+            {foreach $articleValue as $item}
+   
+		 <div class="row pl-5">
+                        <div class="col-lg-8 float-md-right" >
+                            <div class="card bg-white  d-inline-block col-ml-8" style="width: 80%">
+                                <div class="">
+				{if $item->title_image == NULL}
+                                    <img src="https://www.avenuemagazine.com/wp-content/themes/avenue-magazine-new/images/no-image-available.png"
+                                    alt="no_image" style="width: 100%;;">
+						
+                                {else} <img class="card-img-top img-fluid" title="{$item->title_image|noescape}" alt="{$item->title_image|noescape}" src="{$item->title_image|noescape}" style="width: 100%; height:350px;">{/if}
+                                <h3 class="card-title  text-center text-block">
+                                {$item->username|noescape}
+				</h3>
+				</div>
+                                <article class="article-wrapper card-body">{$item->description|noescape}</article>
+                                <hr>
+				<div class="card-footer bg-light">
+                                <h6 class="date">Vytvořeno dne: </h6>
+                                <table class="table">
+					<tr>
+							<td><span class="fa fa-list-alt"></span></td>sekce <td style="background-color: white!important">SEKCE:<label class="text-center badge badge-primary "><a style="color: white!important" class="" n:href="Article:edit $item->url"><small>{$item->url|upper}</a></small></label>
+							</td>
+						<td>Vytvořeno dne:
+                                <label class="badge badge-primary  ">{$item->date_created|date:'d.m. Y'}{sep}{/sep}</label>
+
+						</td>						
+		
+					</tr>
+					
+				</table>
+				<a href="#">linked In</a>
+				<a href="#">facebook</a>
+				<a href="#">youtube</a>
+				<a href="#">web</a>
+                            	</div>
+				</div>
+                        </div>
+                        <div class="col-lg-4">
+			 {foreach $userValue as $userOutput}
+                                <div class="card d-inline-block" style="width:70%;margin:20px 0 24px 0">
+                                    <img class="img-fluid" src="{$userOutput->prof_image|noescape}">
+                                    <div class="card-body">
+
+                                        <h4 class="card-title">{$userOutput->username|upper}</h4>
+                                        <label class="badge badge-secondary">{$userOutput->role}</label>
+                                        <p class="card-text"><a href="#">{$userOutput->url}</a></p>
+                                        <div class="text-muted text-center" style="font-family:Courier New; ">{$userOutput->sign|noescape}</div>
+					<a href="javascript:void(0)" class="btn btn-primary btn-lg p-1 ml-3 mt-5">Read more about me ..</a>
+
+                                    </div>
+                                </div>
+                            {/foreach}
+                        <div class="fb-page" data-href="https://www.facebook.com/albertpateradeveloper" data-tabs="timeline" data-width="" data-height="" data-small-header="false" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true"><blockquote cite="https://www.facebook.com/albertpateradeveloper" class="fb-xfbml-parse-ignore"><a href="https://www.facebook.com/albertpateradeveloper">Albert Patera - developer</a></blockquote></div>   
+
+                        </div>
+
+                    </div>
+            {/foreach}
+
+
+            {foreach $websiteElementValueHeader as $page_footer}
+                <div class="row">
+                    <div class="col">
+                        <footer class="footer bg-dark p-1 ml-5 mr-2" id="page_footer-{$page_footer->id}">
+                            
+				<p class="text-center text-light bg-dark card-footer"> {$page_footer->main_title|upper}</p>
+                        </footer>
+                    </div>
+                </div>
+            {/foreach}
+        </div>
+    {/block}
+{/block}

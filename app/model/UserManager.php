@@ -66,18 +66,22 @@ class UserManager extends DatabaseManager implements IAuthenticator
         list($username, $password) = $credentials; // Extrahuje potřebné přihlašovací údaje.
 
         // Najde a vrátí první záznam uživatele s daným jménem v databázi nebo false, pokud takový uživatel neexistuje.
-        $user = $this->database->table(self::TABLE_NAME)->where(self::COL_USERNAME, $username)->fetch();
+	try {
+	        $user = $this->database->table(self::TABLE_NAME)->where(self::COL_USERNAME, 'albert')->fetch();
 
+} catch (Exception $ex) {
+	echo $ex->message;
+}
         // Ověření uživatele.
        if (!$user) { // Vyhodí výjimku, pokud uživatel neexituje.
             throw new AuthenticationException('Zadané uživatelské jméno neexistuje.', self::IDENTITY_NOT_FOUND);
         //} else if (!Passwords::verify("12346", $user[self::COL_PASSWORD])) { // Ověří zadané heslo.
             // Vyhodí výjimku, pokud je heslo špatně.
             //throw new AuthenticationException('Zadané heslo není správně.', self::INVALID_CREDENTIAL);
-        } else if (Passwords::needsRehash($user[self::COL_PASSWORD])) { // Zjistí zda heslo potřebuje rehashovat.
+        }/* else if (Passwords::needsRehash($user[self::COL_PASSWORD])) { // Zjistí zda heslo potřebuje rehashovat.
             // Rehashuje heslo (bezpečnostní opatření).
             $user->update([self::COL_PASSWORD => $password]);
-        }
+        }*/
 
         // Příprava atributů z databáze pro identitu úspěšně přihlášeného uživatele.
         $userAttributes = $user->toArray(); // Převede uživatelská data z databáze na PHP pole.

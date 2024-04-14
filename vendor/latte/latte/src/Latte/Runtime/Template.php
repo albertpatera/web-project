@@ -5,9 +5,12 @@
  * Copyright (c) 2008 David Grudl (https://davidgrudl.com)
  */
 
+declare(strict_types=1);
+
 namespace Latte\Runtime;
 
 use Latte;
+use Latte\Compiler\Escaper;
 use Latte\Engine;
 
 
@@ -18,70 +21,69 @@ class Template
 {
 	use Latte\Strict;
 
-	/** @var \stdClass global accumulators for intermediate results */
-	public $global;
+	public const
+		LayerTop = 0,
+		LayerSnippet = 'snippet',
+		LayerLocal = 'local';
 
-	/** @var string  @internal */
-	protected $contentType = Engine::CONTENT_HTML;
+	public const ContentType = Latte\ContentType::Html;
 
-	/** @var array  @internal */
-	protected $params = [];
+	public const Blocks = [];
 
-	/** @var FilterExecutor */
-	protected $filters;
+	/** global accumulators for intermediate results */
+	public \stdClass $global;
 
-	/** @var array [name => method]  @internal */
-	protected $blocks = [];
+	/** @var mixed[]  @internal */
+	protected array $params = [];
 
-	/** @var string|null|false  @internal */
-	protected $parentName;
+	protected FilterExecutor $filters;
 
-	/** @var [name => [callbacks]]  @internal */
-	protected $blockQueue = [];
+	/** @internal */
+	protected string|false|null $parentName = null;
 
-	/** @var [name => type]  @internal */
-	protected $blockTypes = [];
+	/** @var mixed[][] */
+	protected array $varStack = [];
 
-	/** @var Engine */
-	private $engine;
+	/** @var Block[][] */
+	protected array $blocks;
 
-	/** @var string */
-	private $name;
+	/** @var mixed[][] */
+	private array $blockStack = [];
 
-	/** @var Template|null  @internal */
-	private $referringTemplate;
-
-	/** @var string|null  @internal */
-	private $referenceType;
+	private Engine $engine;
+	private string $name;
+	private ?Template $referringTemplate = null;
+	private ?string $referenceType = null;
 
 
-	public function __construct(Engine $engine, array $params, FilterExecutor $filters, array $providers, $name)
-	{
+	/**
+	 * @param  mixed[]  $params
+	 */
+	public function __construct(
+		Engine $engine,
+		array $params,
+		FilterExecutor $filters,
+		\stdClass $providers,
+		string $name,
+	) {
 		$this->engine = $engine;
 		$this->params = $params;
 		$this->filters = $filters;
 		$this->name = $name;
-		$this->global = (object) $providers;
-		foreach ($this->blocks as $nm => $method) {
-			$this->blockQueue[$nm][] = [$this, $method];
-		}
-		$this->params['template'] = $this; // back compatibility
+		$this->global = $providers;
+		$this->initBlockLayer(self::LayerTop);
+		$this->initBlockLayer(self::LayerLocal);
+		$this->initBlockLayer(self::LayerSnippet);
 	}
 
 
-	/**
-	 * @return Engine
-	 */
-	public function getEngine()
+	public function getEngine(): Engine
 	{
 		return $this->engine;
 	}
 
 
-	/**
-	 * @return string
-	 */
-	public function getName()
+	public function getName(): string
 	{
 		return $this->name;
 	}
@@ -89,58 +91,36 @@ class Template
 
 	/**
 	 * Returns array of all parameters.
-	 * @return array
+	 * @return mixed[]
 	 */
-	public function getParameters()
+	public function getParameters(): array
 	{
 		return $this->params;
 	}
 
 
 	/**
-	 * Returns parameter.
-	 * @return mixed
+	 * @return string[]
 	 */
-	public function getParameter($name)
+	public function getBlockNames(int|string $layer = self::LayerTop): array
 	{
-		if (!array_key_exists($name, $this->params)) {
-			trigger_error("The variable '$name' does not exist in template.", E_USER_NOTICE);
-		}
-		return $this->params[$name];
+		return array_keys($this->blocks[$layer] ?? []);
 	}
 
 
-	/**
-	 * @return string
-	 */
-	public function getContentType()
-	{
-		return $this->contentType;
-	}
-
-
-	/**
-	 * @return string|null
-	 */
-	public function getParentName()
+	public function getParentName(): ?string
 	{
 		return $this->parentName ?: null;
 	}
 
 
-	/**
-	 * @return Template|null
-	 */
-	public function getReferringTemplate()
+	public function getReferringTemplate(): ?self
 	{
 		return $this->referringTemplate;
 	}
 
 
-	/**
-	 * @return string|null
-	 */
-	public function getReferenceType()
+	public function getReferenceType(): ?string
 	{
 		return $this->referenceType;
 	}
@@ -148,107 +128,95 @@ class Template
 
 	/**
 	 * Renders template.
-	 * @return void
 	 * @internal
 	 */
-	public function render()
+	public function render(?string $block = null): void
 	{
-		$this->prepare();
+		foreach ($this->engine->getExtensions() as $extension) {
+			$extension->beforeRender($this);
+		}
+
+		$params = $this->prepare();
 
 		if ($this->parentName === null && isset($this->global->coreParentFinder)) {
-			$this->parentName = call_user_func($this->global->coreParentFinder, $this);
+			$this->parentName = ($this->global->coreParentFinder)($this);
 		}
-		if (isset($this->global->snippetBridge) && !isset($this->global->snippetDriver)) {
-			$this->global->snippetDriver = new SnippetDriver($this->global->snippetBridge);
-		}
-		Filters::$xhtml = (bool) preg_match('#xml|xhtml#', $this->contentType);
+
+		Filters::$xml = static::ContentType === Latte\ContentType::Xml;
 
 		if ($this->referenceType === 'import') {
 			if ($this->parentName) {
-				$this->createTemplate($this->parentName, [], 'import')->render();
+				throw new Latte\RuntimeException('Imported template cannot use {extends} or {layout}, use {import}');
 			}
-			return;
 
 		} elseif ($this->parentName) { // extends
-			ob_start(function () {});
-			$params = $this->main();
-			ob_end_clean();
-			$this->createTemplate($this->parentName, $params, 'extends')->render();
-			return;
+			$this->params = $params;
+			$this->createTemplate($this->parentName, $params, 'extends')->render($block);
 
-		} elseif (!empty($this->params['_renderblock'])) { // single block rendering
-			$tmp = $this;
-			while (in_array($this->referenceType, ['extends', null], true) && ($tmp = $tmp->referringTemplate));
-			if (!$tmp) {
-				$this->renderBlock($this->params['_renderblock'], $this->params);
-				return;
-			}
+		} elseif ($block !== null) { // single block rendering
+			$this->renderBlock($block, $this->params);
+
+		} else {
+			$this->main($params);
 		}
-
-		// old accumulators for back compatibility
-		$this->params['_l'] = new \stdClass;
-		$this->params['_g'] = $this->global;
-		$this->params['_b'] = (object) ['blocks' => &$this->blockQueue, 'types' => &$this->blockTypes];
-		if (isset($this->global->snippetDriver) && $this->global->snippetBridge->isSnippetMode()) {
-			if ($this->global->snippetDriver->renderSnippets($this->blockQueue, $this->params)) {
-				return;
-			}
-		}
-
-		$this->main();
 	}
 
 
 	/**
 	 * Renders template.
-	 * @return Template
+	 * @param  mixed[]  $params
 	 * @internal
 	 */
-	protected function createTemplate($name, array $params, $referenceType)
+	public function createTemplate(string $name, array $params, string $referenceType): self
 	{
 		$name = $this->engine->getLoader()->getReferredName($name, $this->name);
-		$child = $this->engine->createTemplate($name, $params);
-		$child->referringTemplate = $this;
-		$child->referenceType = $referenceType;
-		$child->global = $this->global;
-		if (in_array($referenceType, ['extends', 'includeblock', 'import'], true)) {
-			$this->blockQueue = array_merge_recursive($this->blockQueue, $child->blockQueue);
-			foreach ($child->blockTypes as $nm => $type) {
-				$this->checkBlockContentType($type, $nm);
+		$referred = $referenceType === 'sandbox'
+			? (clone $this->engine)->setSandboxMode()->createTemplate($name, $params)
+			: $this->engine->createTemplate($name, $params);
+
+		$referred->referringTemplate = $this;
+		$referred->referenceType = $referenceType;
+		$referred->global = $this->global;
+
+		if (in_array($referenceType, ['extends', 'includeblock', 'import', 'embed'], true)) {
+			foreach ($referred->blocks[self::LayerTop] as $nm => $block) {
+				$this->addBlock($nm, $block->contentType, $block->functions);
 			}
-			$child->blockQueue = &$this->blockQueue;
-			$child->blockTypes = &$this->blockTypes;
+
+			$referred->blocks[self::LayerTop] = &$this->blocks[self::LayerTop];
+
+			$this->blocks[self::LayerSnippet] += $referred->blocks[self::LayerSnippet];
+			$referred->blocks[self::LayerSnippet] = &$this->blocks[self::LayerSnippet];
 		}
-		return $child;
+
+		return $referred;
 	}
 
 
 	/**
-	 * @param  string|\Closure content-type name or modifier closure
-	 * @return void
+	 * @param  string|\Closure|null  $mod  content-type name or modifier closure
 	 * @internal
 	 */
-	protected function renderToContentType($mod)
+	public function renderToContentType(string|\Closure|null $mod, ?string $block = null): void
 	{
-		if ($mod instanceof \Closure) {
-			echo $mod($this->capture([$this, 'render']), $this->contentType);
-		} elseif ($mod && $mod !== $this->contentType) {
-			if ($filter = Filters::getConvertor($this->contentType, $mod)) {
-				echo $filter($this->capture([$this, 'render']));
-			} else {
-				trigger_error("Including '$this->name' with content type " . strtoupper($this->contentType) . ' into incompatible type ' . strtoupper($mod) . '.', E_USER_WARNING);
-			}
-		} else {
-			$this->render();
-		}
+		$this->filter(
+			fn() => $this->render($block),
+			$mod,
+			static::ContentType,
+			"'$this->name'",
+		);
 	}
 
 
-	/**
-	 * @return void
-	 * @internal
-	 */
-	public function prepare()
+	/** @return mixed[] */
+	public function prepare(): array
+	{
+		return $this->params;
+	}
+
+
+	/** @param mixed[] $params */
+	public function main(array $params): void
 	{
 	}
 
@@ -258,135 +226,160 @@ class Template
 
 	/**
 	 * Renders block.
-	 * @param  string
-	 * @param  array
-	 * @param  string|\Closure content-type name or modifier closure
-	 * @return void
+	 * @param  mixed[]  $params
+	 * @param  string|\Closure|null  $mod  content-type name or modifier closure
 	 * @internal
 	 */
-	protected function renderBlock($name, array $params, $mod = null)
+	public function renderBlock(
+		string $name,
+		array $params,
+		string|\Closure|null $mod = null,
+		int|string|null $layer = null,
+	): void
 	{
-		if (empty($this->blockQueue[$name])) {
-			$hint = isset($this->blockQueue) && ($t = Latte\Helpers::getSuggestion(array_keys($this->blockQueue), $name)) ? ", did you mean '$t'?" : '.';
-			throw new \RuntimeException("Cannot include undefined block '$name'$hint");
+		$block = $layer
+			? ($this->blocks[$layer][$name] ?? null)
+			: ($this->blocks[self::LayerLocal][$name] ?? $this->blocks[self::LayerTop][$name] ?? null);
+
+		if (!$block) {
+			$hint = $layer && ($t = Latte\Helpers::getSuggestion($this->getBlockNames($layer), $name))
+				? ", did you mean '$t'?"
+				: '.';
+			$name = $layer ? "$layer $name" : $name;
+			throw new Latte\RuntimeException("Cannot include undefined block '$name'$hint");
 		}
 
-		$block = reset($this->blockQueue[$name]);
-		if ($mod && $mod !== ($blockType = $this->blockTypes[$name])) {
-			if ($filter = (is_string($mod) ? Filters::getConvertor($blockType, $mod) : $mod)) {
-				echo $filter($this->capture(function () use ($block, $params) { $block($params); }), $blockType);
-				return;
-			}
-			trigger_error("Including block $name with content type " . strtoupper($blockType) . ' into incompatible type ' . strtoupper($mod) . '.', E_USER_WARNING);
-		}
-		$block($params);
+		$this->filter(
+			fn() => reset($block->functions)($params),
+			$mod,
+			$block->contentType,
+			"block $name",
+		);
 	}
 
 
 	/**
 	 * Renders parent block.
-	 * @return void
+	 * @param  mixed[]  $params
 	 * @internal
 	 */
-	protected function renderBlockParent($name, array $params)
+	public function renderBlockParent(string $name, array $params): void
 	{
-		if (empty($this->blockQueue[$name]) || ($block = next($this->blockQueue[$name])) === false) {
-			throw new \RuntimeException("Cannot include undefined parent block '$name'.");
+		$block = $this->blocks[self::LayerLocal][$name] ?? $this->blocks[self::LayerTop][$name] ?? null;
+		if (!$block || ($function = next($block->functions)) === false) {
+			throw new Latte\RuntimeException("Cannot include undefined parent block '$name'.");
 		}
-		$block($params);
-		prev($this->blockQueue[$name]);
+		$function($params);
+		prev($block->functions);
 	}
 
 
 	/**
-	 * @return void
+	 * Creates block if doesn't exist and checks if content type is the same.
+	 * @param  callable[]  $functions
 	 * @internal
 	 */
-	protected function checkBlockContentType($current, $name)
+	protected function addBlock(
+		string $name,
+		string $contentType,
+		array $functions,
+		int|string|null $layer = null,
+	): void
 	{
-		$expected = &$this->blockTypes[$name];
-		if ($expected === null) {
-			$expected = $current;
-		} elseif ($expected !== $current) {
-			trigger_error("Overridden block $name with content type " . strtoupper($current) . ' by incompatible type ' . strtoupper($expected) . '.', E_USER_WARNING);
+		$block = &$this->blocks[$layer ?? self::LayerTop][$name];
+		$block ??= new Block;
+		if ($block->contentType === null) {
+			$block->contentType = $contentType;
+
+		} elseif (!Escaper::getConvertor($contentType, $block->contentType)) {
+			throw new Latte\RuntimeException(sprintf(
+				"Overridden block $name with content type %s by incompatible type %s.",
+				strtoupper($contentType),
+				strtoupper($block->contentType),
+			));
+		}
+
+		$block->functions = array_merge($block->functions, $functions);
+	}
+
+
+	/**
+	 * @param  string|\Closure|null  $mod  content-type name or modifier closure
+	 */
+	private function filter(callable $function, string|\Closure|null $mod, string $contentType, string $name): void
+	{
+		if ($mod === null || $mod === $contentType) {
+			$function();
+
+		} elseif ($mod instanceof \Closure) {
+			echo $mod($this->capture($function), $contentType);
+
+		} elseif ($filter = Escaper::getConvertor($contentType, $mod)) {
+			echo $filter($this->capture($function));
+
+		} else {
+			throw new Latte\RuntimeException(sprintf(
+				"Including $name with content type %s into incompatible type %s.",
+				strtoupper($contentType),
+				strtoupper($mod),
+			));
 		}
 	}
 
 
 	/**
 	 * Captures output to string.
-	 * @return string
 	 * @internal
 	 */
-	public function capture(callable $function)
+	public function capture(callable $function): string
 	{
-		ob_start(function () {});
 		try {
-			$this->global->coreCaptured = true;
+			ob_start(fn() => '');
 			$function();
-		} catch (\Exception $e) {
+			return ob_get_clean();
 		} catch (\Throwable $e) {
-		}
-		$this->global->coreCaptured = false;
-		if (isset($e)) {
 			ob_end_clean();
 			throw $e;
 		}
-		return ob_get_clean();
 	}
 
 
-	/** @deprecated */
-	public function setParameters(array $params)
+	private function initBlockLayer(int|string $staticId, ?int $destId = null): void
 	{
-		trigger_error(__METHOD__ . ' is deprecated.', E_USER_DEPRECATED);
-		$this->params = $params;
-		return $this;
-	}
-
-
-	/********************* deprecated ****************d*g**/
-
-
-	/** @deprecated */
-	public function __call($name, $args)
-	{
-		trigger_error("Invoking filters via \$template->$name(\$vars) is deprecated, use (\$vars|$name)", E_USER_DEPRECATED);
-		return call_user_func_array($this->filters->$name, $args);
-	}
-
-
-	/** @deprecated */
-	public function __set($name, $value)
-	{
-		trigger_error("Access to parameters via \$template->$name is deprecated", E_USER_DEPRECATED);
-		$this->params[$name] = $value;
-	}
-
-
-	/** @deprecated */
-	public function &__get($name)
-	{
-		trigger_error("Access to parameters via \$template->$name is deprecated, use \$this->getParameter('$name')", E_USER_DEPRECATED);
-		if (!array_key_exists($name, $this->params)) {
-			trigger_error("The variable '$name' does not exist in template.");
+		$destId ??= $staticId;
+		$this->blocks[$destId] = [];
+		foreach (static::Blocks[$staticId] ?? [] as $nm => $info) {
+			[$method, $contentType] = is_array($info) ? $info : [$info, static::ContentType];
+			$this->addBlock($nm, $contentType, [[$this, $method]], $destId);
 		}
-		return $this->params[$name];
 	}
 
 
-	/** @deprecated */
-	public function __isset($name)
+	protected function enterBlockLayer(int $staticId, array $vars): void
 	{
-		trigger_error("Access to parameters via \$template->$name is deprecated, use isset(\$this->getParameters()['$name'])", E_USER_DEPRECATED);
-		return isset($this->params[$name]);
+		$this->blockStack[] = $this->blocks[self::LayerTop];
+		$this->initBlockLayer($staticId, self::LayerTop);
+		$this->varStack[] = $vars;
 	}
 
 
-	/** @deprecated */
-	public function __unset($name)
+	protected function copyBlockLayer(): void
 	{
-		trigger_error("Access to parameters via \$template->$name is deprecated.", E_USER_DEPRECATED);
-		unset($this->params[$name]);
+		foreach (end($this->blockStack) as $nm => $block) {
+			$this->addBlock($nm, $block->contentType, $block->functions);
+		}
+	}
+
+
+	protected function leaveBlockLayer(): void
+	{
+		$this->blocks[self::LayerTop] = array_pop($this->blockStack);
+		array_pop($this->varStack);
+	}
+
+
+	public function hasBlock(string $name): bool
+	{
+		return isset($this->blocks[self::LayerLocal][$name]) || isset($this->blocks[self::LayerTop][$name]);
 	}
 }

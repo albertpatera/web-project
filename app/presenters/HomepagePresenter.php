@@ -75,10 +75,11 @@ final class HomepagePresenter extends Nette\Application\UI\Presenter
         }
         $this->getTemplate()->userValue = $userValue;
 
-        if (!($article = $this->articleValue->getArticles())) {
-            $this->error("here is noot working :("); // Vyhazuje výjimku BadRequestException.
-        }
-        try {
+        //if (!($article = $this->articleValue->getArticles())) {
+          //  $this->error(); // Vyhazuje výjimku BadRequestException.
+       // }
+        
+	try {
             $userValue = $this->userValue->getUserToHp();
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
@@ -88,7 +89,7 @@ final class HomepagePresenter extends Nette\Application\UI\Presenter
         try {
             $article = $this->articleValue->getArticles();
             if (!($userValue = $this->userValue->getUserToHp())) {
-                $this->error("Here is not working :( !"); // Vyhazuje výjimku BadRequestException.
+                //$this->error($e->getMessage()); // Vyhazuje výjimku BadRequestException.
             }
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
@@ -164,7 +165,7 @@ final class HomepagePresenter extends Nette\Application\UI\Presenter
             $user->login("Albert Patera", "000");
 
             $user->isLoggedIn();
-            $this->redirect(200, 'User:edit');
+            $this->redirect( 'User:edit');
 
             $user->setExpiration('30 minutes');
             $user->getLogoutReason();
