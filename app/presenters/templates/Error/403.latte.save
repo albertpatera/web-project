@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+	<style>
+.container {
+    height: 100%!important;
+    display: flex!important;
+    justify-content: center!important;
+    align-items: center!important;
+}
+
+.title {
+		font-family: Courier New;
+		font-size: 30px;
+		text-align: center;
+	}
+	</style>
+
+</head>
+<body>
+ 
+<div class="container">
+<div class="mx-auto"> 
+<br><br><br>
+<hr> 
+<div class="card ml-5 mb-4" style="width:100%">
+    <img class="card-img-top" src="https://media.tenor.com/ie2HahZtNREAAAAi/chick-stab-get-out.gif" alt="Card image" style="width:50px; height: 75px">
+	<pre> >> You should really go out !!</pre>
+    <div class="card-body alert alert-danger">
+      <h3 class="card-title  text-center alert alert-danger">
+Access Denied
+		<span style="font-size: 35px; float: right; color: red" class="fa fa-ban"></span>
+	</h4>
+      <p class="card-text lead text-center">You are not permmited to see this page</p>
+    </div>
+	<div class="card-footer">Albert Patera</div>
+  </div>
+  </div>
+  
+</div>
+
+</body>
+</html>
+

@@ -7,7 +7,20 @@
    {/block}
    <h1 n:block="title" class="test-center alert alert-success">Adding articles</h1>
    <h2><a n:href="User:add">User manager</a></h2>
-   {control postForm}
+<div class="col-md-8">
+<form n:name=postForm n:class=form-group form-lg>
+		
+		<p><label n:name=username>Titulek: <input n:class=form-control input-lg  n:name=username size=20  autofocus></label><p>
+		<p><label n:name=description>Obsah: <textarea n:class=form-control input-lg n:name=description size=20 autofocus rows=10></textarea></label></p>
+		<p><label>Sekce: <input n:class=form-control n:name=url></label></p>
+				<p><label{control postForm}
+ n:name=username>Titulek: <input type=submit n:class=form-control input-lg btn btn-primary  n:name=description size=20  autofocus></label></p>
+				<p><label n:name=date_created>datum: <input type=date n:class=form-control input-lg btn btn-primary  n:name=date_created size=20  autofocus></label></p>
+			
+</form>
+</div>
+
+</div>
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-10">

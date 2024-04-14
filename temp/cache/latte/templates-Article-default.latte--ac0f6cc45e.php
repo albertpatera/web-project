@@ -128,7 +128,7 @@ final class Templateac0f6cc45e extends Latte\Runtime\Template
 			echo LR\Filters::escapeHtmlText($articleDayly->username) /* line 60 */;
 			echo '</td>
             <td>';
-			echo ($this->filters->texy)($articleDayly->description) /* line 61 */;
+			echo $articleDayly->description /* line 61 */;
 			echo '</td>
             <td>
                 <a href="';

@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-class Container_4c8c2a232e extends Nette\DI\Container
+class Container_7fc09b78f9 extends Nette\DI\Container
 {
 	protected $tags = [
 		'nette.inject' => [
@@ -359,7 +359,7 @@ class Container_4c8c2a232e extends Nette\DI\Container
 	}
 
 
-	public function createServiceContainer(): Container_4c8c2a232e
+	public function createServiceContainer(): Container_7fc09b78f9
 	{
 		return $this;
 	}
@@ -431,7 +431,7 @@ class Container_4c8c2a232e extends Nette\DI\Container
 			private $container;
 
 
-			public function __construct(Container_4c8c2a232e $container)
+			public function __construct(Container_7fc09b78f9 $container)
 			{
 				$this->container = $container;
 			}

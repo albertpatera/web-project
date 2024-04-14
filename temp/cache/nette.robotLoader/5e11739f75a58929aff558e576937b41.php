@@ -10,12 +10,12 @@ return array (
     'App\\Model\\UserManager' => 
     array (
       0 => '/var/www/blog.albertpatera.cz/app/model/UserManager.php',
-      1 => 1675460504,
+      1 => 1712505976,
     ),
     'App\\Model\\ArticleManager' => 
     array (
       0 => '/var/www/blog.albertpatera.cz/app/model/ArticleManager.php',
-      1 => 1675460504,
+      1 => 1712505976,
     ),
     'App\\Model\\HomepageManager' => 
     array (
@@ -30,22 +30,27 @@ return array (
     'App\\Model\\AdminManager' => 
     array (
       0 => '/var/www/blog.albertpatera.cz/app/model/AdminManager.php',
-      1 => 1675460504,
+      1 => 1712505976,
     ),
     'App\\Presenters\\UserPresenter' => 
     array (
       0 => '/var/www/blog.albertpatera.cz/app/presenters/UserPresenter.php',
-      1 => 1629489562,
+      1 => 1712504581,
     ),
     'App\\Presenters\\HomepagePresenter' => 
     array (
       0 => '/var/www/blog.albertpatera.cz/app/presenters/HomepagePresenter.php',
-      1 => 1675460504,
+      1 => 1712505976,
+    ),
+    'App\\Presenters\\AdminPresenter' => 
+    array (
+      0 => '/var/www/blog.albertpatera.cz/app/presenters/AdminPresenter.php',
+      1 => 1712505976,
     ),
     'App\\Presenters\\ErrorPresenter' => 
     array (
       0 => '/var/www/blog.albertpatera.cz/app/presenters/ErrorPresenter.php',
-      1 => 1675460504,
+      1 => 1712505976,
     ),
     'App\\Presenters\\Error4xxPresenter' => 
     array (
@@ -55,17 +60,12 @@ return array (
     'App\\Presenters\\TestPresenter' => 
     array (
       0 => '/var/www/blog.albertpatera.cz/app/presenters/TestPresenter.php',
-      1 => 1675460504,
+      1 => 1712505976,
     ),
     'App\\Presenters\\ArticlePresenter' => 
     array (
       0 => '/var/www/blog.albertpatera.cz/app/presenters/ArticlePresenter.php',
-      1 => 1689626397,
-    ),
-    'App\\Presenters\\AdminPresenter' => 
-    array (
-      0 => '/var/www/blog.albertpatera.cz/app/presenters/AdminPresenter.php',
-      1 => 1689626544,
+      1 => 1712506445,
     ),
   ),
   1 => 
@@ -78,11 +78,11 @@ return array (
     'App\\Presenters\\ArticleEditTemplate' => 3,
     'App\\Presenters\\ArticleTemplate' => 3,
     'App\\Presenters\\UserAddTemplate' => 3,
-    'App\\Presenters\\ArticleDefaultTemplate' => 1,
+    'App\\Presenters\\ArticleDefaultTemplate' => 3,
   ),
   2 => 
   array (
-    '/var/www/blog.albertpatera.cz/app/bootstrap.php' => 1689623703,
+    '/var/www/blog.albertpatera.cz/app/bootstrap.php' => 1712505976,
     '/var/www/blog.albertpatera.cz/app/model/AdminPresenter.php' => 1629489562,
   ),
 );
